@@ -10,10 +10,13 @@
     <meta name="author" content="MoodYatra Team">
     <meta name="keywords" content="spontaneous trip, travel, adventure, micro-trip, AI, MoodYatra">
     <meta name="og:title" content="MoodYatra - Spontaneous Trip Generator">
+    <meta name="og:site_name" content="MoodYatra">
+    <link rel="shortcut icon" href="/assets/favicon.png" type="image/png">
     <meta name="og:description"
         content="AI-powered micro-trip generator for spontaneous travelers. Just pick your mood, and we'll create the perfect local adventure.">
-    <meta name="og:image" content="https://example.com/MoodYatra-logo.png">
+    <meta name="og:image" content="/assets/preview.png">
     <meta name="og:type" content="website">
+    <meta name="og:url" content="https://safal-tiwari.github.io/MoodYatra/">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="MoodYatra - Spontaneous Trip Generator">
     <meta name="twitter:description"
@@ -23,6 +26,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Prevent theme flash by applying theme immediately -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 
 <body>
@@ -36,10 +47,10 @@
 
             <!-- Desktop Navigation -->
             <div class="nav-links desktop-nav">
-                <a href="#" class="nav-link">My Trips</a>
-                <a href="#" class="nav-link">Explore</a>
-                <a href="#" class="nav-link">Travel Guide</a>
-                <a href="#" class="nav-link">Contact</a>
+                <a href="/my-trips.html" class="nav-link">My Trips</a>
+                <a href="/travel-guide.html" class="nav-link">Travel Guide</a>
+                <a href="/about.html" class="nav-link">About</a>
+                <a href="/contact.html" class="nav-link">Contact Us</a>
                 <button class="btn-secondary" onclick="showAuthModal()">Sign In</button>
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
                     <i class="fas fa-sun"></i>
@@ -47,26 +58,28 @@
                 </button>
             </div>
 
-            <!-- Mobile Menu Toggle -->
-            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+            <!-- Mobile Controls -->
+            <div class="mobile-controls">
+                <button class="theme-toggle mobile-theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </div>
 
         <!-- Mobile Navigation Menu -->
         <div class="mobile-nav" id="mobileNav">
             <div class="mobile-nav-content">
-                <a href="#" class="mobile-nav-link">My Trips</a>
-                <a href="#" class="mobile-nav-link">Explore</a>
-                <a href="#" class="mobile-nav-link">Travel Guide</a>
-                <a href="#" class="mobile-nav-link">Contact</a>
+                <a href="/my-trips.html" class="mobile-nav-link">My Trips</a>
+                <a href="/travel-guide.html" class="mobile-nav-link">Travel Guide</a>
+                <a href="/about.html" class="mobile-nav-link">About Us</a>
+                <a href="/contact.html" class="mobile-nav-link">Contact Us</a>
                 <button class="btn-secondary mobile-signin" onclick="showAuthModal()">Sign In</button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </button>
             </div>
         </div>
     </header>
@@ -207,11 +220,7 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // Load saved theme on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        });
+        // Theme is already loaded in head, no need to set it again on DOMContentLoaded
     </script>
 </body>
 
