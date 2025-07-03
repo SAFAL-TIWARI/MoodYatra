@@ -31,7 +31,7 @@ MoodYatra is a lightweight, AI-powered web application that generates personaliz
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/MoodYatra/MoodYatra.git
+   git clone https://github.com/SAFAL-TIWARI/MoodYatra.git
    cd MoodYatra
    ```
 
@@ -54,6 +54,7 @@ MoodYatra is a lightweight, AI-powered web application that generates personaliz
 5. **Open your browser**
    ```
    http://localhost:3000
+   or https://localhost:5500
    ```
 
 ## 🔧 Configuration
@@ -149,6 +150,8 @@ MoodYatra/
 ├── view.html              # Shared trip viewer
 ├── css/
 │   └── styles.css         # Main stylesheet
+├──assets/
+|   └── images
 ├── js/
 │   ├── app.js            # Main application logic
 │   ├── auth.js           # Authentication system
