@@ -1,0 +1,56 @@
+{
+  "name": "MoodYatra",
+  "version": "1.0.0",
+  "description": "AI-powered micro-trip generator for spontaneous travelers",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "test": "jest",
+    "build": "echo 'No build step required for this project'",
+    "setup": "npm install && node scripts/setup.js",
+    "backup-db": "node scripts/backup-db.js",
+    "seed-db": "node scripts/seed-db.js"
+  },
+  "keywords": [
+    "travel",
+    "ai",
+    "trip-planning",
+    "gemini",
+    "google-maps",
+    "itinerary",
+    "spontaneous-travel"
+  ],
+  "author": "MoodYatra Team",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.2.1",
+    "@googlemaps/google-maps-services-js": "^3.3.42",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoodYatra/MoodYatra.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MoodYatra/MoodYatra/issues"
+  },
+  "homepage": "https://MoodYatra.ai",
+  "type": "commonjs"
+}

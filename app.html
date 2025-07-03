@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Trip - MoodYatra</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav">
+            <div class="logo neon-glow">
+                <a href="index.html">
+                    <i class="fas fa-compass"></i>
+                    <span>MoodYatra</span>
+                </a>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-links desktop-nav">
+                <a href="#" class="nav-link">My Trips</a>
+                <a href="#" class="nav-link">Explore</a>
+                <a href="#" class="nav-link">Travel Guide</a>
+                <a href="#" class="nav-link">Contact</a>
+                <button class="btn-secondary" onclick="showAuthModal()">Sign In</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-content">
+                <a href="#" class="mobile-nav-link">My Trips</a>
+                <a href="#" class="mobile-nav-link">Explore</a>
+                <a href="#" class="mobile-nav-link">Travel Guide</a>
+                <a href="#" class="mobile-nav-link">Contact</a>
+                <button class="btn-secondary mobile-signin" onclick="showAuthModal()">Sign In</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Trip Generator -->
+        <section class="trip-generator">
+            <div class="generator-container">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <span>1</span>
+                        <label>Mood</label>
+                    </div>
+                    <div class="step" data-step="2">
+                        <span>2</span>
+                        <label>Details</label>
+                    </div>
+                    <div class="step" data-step="3">
+                        <span>3</span>
+                        <label>Generate</label>
+                    </div>
+                </div>
+
+                <!-- Form Steps -->
+                <div class="form-container border-glow">
+                    <!-- Step 1: Mood Selection -->
+                    <div class="form-step active" id="step1">
+                        <h2>What's your travel vibe today?</h2>
+                        <div class="mood-selection">
+                            <button class="mood-option" data-mood="fun">
+                                <div class="mood-icon">🎢</div>
+                                <span>Adventure & Fun</span>
+                            </button>
+                            <button class="mood-option" data-mood="chill">
+                                <div class="mood-icon">🏖️</div>
+                                <span>Relax & Unwind</span>
+                            </button>
+                            <button class="mood-option" data-mood="nature">
+                                <div class="mood-icon">🏔️</div>
+                                <span>Nature Escape</span>
+                            </button>
+                            <button class="mood-option" data-mood="romantic">
+                                <div class="mood-icon">🌅</div>
+                                <span>Romantic Getaway</span>
+                            </button>
+                        </div>
+                        <button class="btn-primary" onclick="nextStep()" disabled id="nextBtn1">Continue</button>
+                    </div>
+
+                    <!-- Step 2: Trip Details -->
+                    <div class="form-step" id="step2">
+                        <h2>Tell us about your trip</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="location">Starting Location</label>
+                                <div class="location-input">
+                                    <input type="text" id="location" placeholder="Enter your location">
+                                    <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                                        <i class="fas fa-location-arrow"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="duration">Time Available</label>
+                                <select id="duration">
+                                    <option value="2">2 hours</option>
+                                    <option value="4">4 hours</option>
+                                    <option value="6" selected>6 hours</option>
+                                    <option value="8">8 hours (Full day)</option>
+                                    <option value="12">12+ hours</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="budget">Budget Range</label>
+                                <div class="budget-slider">
+                                    <input type="range" id="budget" min="0" max="4" value="2" step="1">
+                                    <div class="budget-labels">
+                                        <span>Free</span>
+                                        <span>₹</span>
+                                        <span>₹₹</span>
+                                        <span>₹₹₹</span>
+                                        <span>₹₹₹₹</span>
+                                    </div>
+                                </div>
+                                <div class="budget-display" id="budgetDisplay">Moderate (₹₹)</div>
+                            </div>
+
+                            <div class="form-group prompt-section">
+                                <div class="prompt-header">
+                                    <label for="customPrompt">
+                                        <div class="prompt-icon">
+                                            <i class="fas fa-robot"></i>
+                                        </div>
+                                        <i class="fas fa-magic"></i>
+                                        Custom Instructions (Optional)
+                                    </label>
+                                    <!-- <span class="ai-badge">AI Enhanced</span> -->
+                                </div>
+                                <div class="prompt-input-container">
+                                    <textarea id="customPrompt" class="prompt-textarea" placeholder="✨ Tell our AI what makes your perfect trip... 
+
+Examples:
+• 'I want to visit historical sites and museums'
+• 'Include pet-friendly places for my dog'
+• 'Focus on local street food and markets'
+• 'I'm interested in photography spots'
+• 'Plan around accessibility needs'" rows="4" maxlength="500"></textarea>
+                                </div>
+                                <div class="prompt-footer">
+                                    <small class="form-hint">
+                                        <i class="fas fa-lightbulb"></i>
+                                        The more specific you are, the better we can personalize your adventure!
+                                    </small>
+                                    <div class="character-count">
+                                        <span id="promptCharCount">0</span>/500 characters
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Additional Preferences</label>
+                                <div class="preferences">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="foodie">
+                                        <span>Include food experiences</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="cultural">
+                                        <span>Cultural attractions</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="shopping">
+                                        <span>Shopping opportunities</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-secondary" onclick="prevStep()">Back</button>
+                            <button class="btn-primary" onclick="nextStep()" id="nextBtn2">Generate Trip</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Loading & Results -->
+                    <div class="form-step" id="step3">
+                        <div class="loading-container" id="loadingState">
+                            <div class="loading-animation">
+                                <div class="spinner"></div>
+                                <h3>Creating your perfect trip...</h3>
+                                <p id="loadingText">Analyzing your preferences</p>
+                            </div>
+                        </div>
+
+                        <div class="results-container" id="resultsState" style="display: none;">
+                            <div class="results-header">
+                                <h2 id="tripTitle">Your Perfect Day</h2>
+                                <div class="trip-meta">
+                                    <span id="tripDuration"></span>
+                                    <span id="tripBudget"></span>
+                                    <span id="tripMood"></span>
+                                </div>
+                            </div>
+
+                            <div class="results-content">
+                                <div class="itinerary-section">
+                                    <h3>Your Itinerary</h3>
+                                    <div id="itineraryList" class="itinerary-list">
+                                        <!-- Itinerary items will be populated here -->
+                                    </div>
+                                </div>
+
+                                <div class="map-section">
+                                    <h3>Your Route</h3>
+                                    <div id="map" class="map-container"></div>
+                                </div>
+                            </div>
+
+                            <div class="results-actions">
+                                <button class="btn-secondary" onclick="generateNew()">
+                                    <i class="fas fa-redo"></i>
+                                    Generate New
+                                </button>
+                                <button class="btn-primary" onclick="exportPDF()">
+                                    <i class="fas fa-download"></i>
+                                    Export PDF
+                                </button>
+                                <button class="btn-primary" onclick="shareTrip()">
+                                    <i class="fas fa-share-alt"></i>
+                                    Share Trip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeShareModal()">&times;</span>
+            <div class="share-container">
+                <h2>Share Your Trip</h2>
+                <p>Anyone can view your trip with this link - no login required!</p>
+
+                <div class="share-link">
+                    <input type="text" id="shareUrl" readonly>
+                    <button onclick="copyShareLink()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+
+                <div class="qr-section">
+                    <h3>QR Code</h3>
+                    <div id="qrCode" class="qr-code"></div>
+                </div>
+
+                <div class="social-share">
+                    <button class="social-btn twitter" onclick="shareToTwitter()">
+                        <i class="fab fa-twitter"></i>
+                        Twitter
+                    </button>
+                    <button class="social-btn facebook" onclick="shareToFacebook()">
+                        <i class="fab fa-facebook"></i>
+                        Facebook
+                    </button>
+                    <button class="social-btn whatsapp" onclick="shareToWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <div class="auth-container">
+                <h2>Sign In to Save Your Trips</h2>
+                <p>No account needed to generate trips, but sign in to save and sync them!</p>
+
+                <form id="authForm" class="auth-form">
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <button class="btn-google" onclick="signInWithGoogle()">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </button>
+
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMaps"
+        async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/maps.js"></script>
+    <script src="js/gemini.js"></script>
+    <script src="js/pdf.js"></script>
+    <script src="js/autocomplete.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function toggleMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+
+            mobileNav.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('authModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function (event) {
+            const mobileNav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+
+            if (!mobileNav.contains(event.target) && !toggle.contains(event.target)) {
+                mobileNav.classList.remove('active');
+                toggle.classList.remove('active');
+            }
+        });
+
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+
+</html>

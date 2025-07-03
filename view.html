@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Trip - MoodYatra</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav">
+            <div class="logo neon-glow">
+                <a href="index.html">
+                    <i class="fas fa-compass"></i>
+                    <span>MoodYatra</span>
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <div class="nav-links desktop-nav">
+                <a href="#" class="nav-link">Trips</a>
+                <a href="#" class="nav-link">About</a>
+                <a href="#" class="nav-link">Guide</a>
+                <a href="#" class="nav-link">Contact Us</a>
+                <a href="index.html" class="btn-primary">Create Your Own Trip</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-content">
+                <a href="#" class="mobile-nav-link">Trips</a>
+                <a href="#" class="mobile-nav-link">About</a>
+                <a href="#" class="mobile-nav-link">Guide</a>
+                <a href="#" class="mobile-nav-link">Contact Us</a>
+                <a href="index.html" class="btn-primary mobile-signin">Create Your Own Trip</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Shared Trip View -->
+        <section class="shared-trip">
+            <div class="loading-container" id="loadingState">
+                <div class="loading-animation">
+                    <div class="spinner"></div>
+                    <h3>Loading trip...</h3>
+                </div>
+            </div>
+
+            <div class="trip-container" id="tripContainer" style="display: none;">
+                <div class="trip-header border-glow">
+                    <h1 id="tripTitle" class="neon-glow">Amazing Day Trip</h1>
+                    <div class="trip-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="tripDuration">6 hours</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span id="tripBudget">$$</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-heart"></i>
+                            <span id="tripMood">Fun</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="tripLocation">Location</span>
+                        </div>
+                    </div>
+                    <p id="tripDescription" class="trip-description">
+                        A perfect day planned just for you with AI-powered recommendations.
+                    </p>
+                </div>
+
+                <div class="trip-content">
+                    <div class="content-grid">
+                        <div class="itinerary-column">
+                            <h2>Your Itinerary</h2>
+                            <div id="itineraryList" class="itinerary-list">
+                                <!-- Itinerary items will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="map-column">
+                            <h2>Route Map</h2>
+                            <div id="map" class="map-container"></div>
+                            
+                            <div class="trip-stats">
+                                <div class="stat">
+                                    <span class="stat-number" id="totalStops">0</span>
+                                    <span class="stat-label">Stops</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number" id="totalDistance">0</span>
+                                    <span class="stat-label">km</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number" id="estimatedCost">$0</span>
+                                    <span class="stat-label">Est. Cost</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trip-actions">
+                    <button class="btn-secondary" onclick="exportPDF()">
+                        <i class="fas fa-download"></i>
+                        Download PDF
+                    </button>
+                    <button class="btn-secondary" onclick="shareTrip()">
+                        <i class="fas fa-share-alt"></i>
+                        Share Again
+                    </button>
+                    <a href="index.html" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Create My Own Trip
+                    </a>
+                </div>
+            </div>
+
+            <div class="error-container" id="errorState" style="display: none;">
+                <div class="error-content">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>Trip Not Found</h2>
+                    <p>Sorry, we couldn't find the trip you're looking for. It may have been removed or the link is invalid.</p>
+                    <a href="index.html" class="btn-primary">Create a New Trip</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MoodYatra</h3>
+                    <p>Building tomorrow's utility tools - before they exist today.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>AI-Powered Planning</li>
+                        <li>Mood-Based Recommendations</li>
+                        <li>Instant Sharing</li>
+                        <li>PDF Export</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MoodYatra. Built for the future of spontaneous travel.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeShareModal()">&times;</span>
+            <div class="share-container">
+                <h2>Share This Trip</h2>
+                <p>Share this amazing itinerary with friends and family!</p>
+                
+                <div class="share-link">
+                    <input type="text" id="shareUrl" readonly>
+                    <button onclick="copyShareLink()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                
+                <div class="qr-section">
+                    <h3>QR Code</h3>
+                    <div id="qrCode" class="qr-code"></div>
+                </div>
+                
+                <div class="social-share">
+                    <button class="social-btn twitter" onclick="shareToTwitter()">
+                        <i class="fab fa-twitter"></i>
+                        Twitter
+                    </button>
+                    <button class="social-btn facebook" onclick="shareToFacebook()">
+                        <i class="fab fa-facebook"></i>
+                        Facebook
+                    </button>
+                    <button class="social-btn whatsapp" onclick="shareToWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMaps" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script src="js/maps.js"></script>
+    <script src="js/pdf.js"></script>
+    <script>
+        // Get trip ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tripId = urlParams.get('id');
+
+        // Load trip data
+        async function loadTrip() {
+            if (!tripId) {
+                showError();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/trips/${tripId}`);
+                if (!response.ok) {
+                    throw new Error('Trip not found');
+                }
+
+                const tripData = await response.json();
+                displayTrip(tripData);
+            } catch (error) {
+                console.error('Error loading trip:', error);
+                showError();
+            }
+        }
+
+        function displayTrip(tripData) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('tripContainer').style.display = 'block';
+
+            // Update trip details
+            document.getElementById('tripTitle').textContent = tripData.title;
+            document.getElementById('tripDuration').textContent = `${tripData.duration} hours`;
+            document.getElementById('tripBudget').textContent = getBudgetDisplay(tripData.budget);
+            document.getElementById('tripMood').textContent = tripData.mood;
+            document.getElementById('tripLocation').textContent = tripData.location;
+            document.getElementById('tripDescription').textContent = tripData.description;
+
+            // Display itinerary
+            displayItinerary(tripData.itinerary);
+
+            // Initialize map
+            initializeMap(tripData.itinerary, tripData.location);
+
+            // Update stats
+            updateTripStats(tripData);
+
+            // Set share URL
+            document.getElementById('shareUrl').value = window.location.href;
+            generateQRCode(window.location.href);
+        }
+
+        function displayItinerary(itinerary) {
+            const container = document.getElementById('itineraryList');
+            container.innerHTML = '';
+
+            itinerary.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'itinerary-item';
+                itemElement.innerHTML = `
+                    <div class="item-time">${item.time}</div>
+                    <div class="item-content">
+                        <h3>${item.name}</h3>
+                        <p>${item.description}</p>
+                        <div class="item-details">
+                            <span class="item-type">${item.type}</span>
+                            <span class="item-duration">${item.duration}</span>
+                            ${item.cost ? `<span class="item-cost">${item.cost}</span>` : ''}
+                        </div>
+                    </div>
+                    ${item.image ? `<div class="item-image"><img src="${item.image}" alt="${item.name}"></div>` : ''}
+                `;
+                container.appendChild(itemElement);
+            });
+        }
+
+        function updateTripStats(tripData) {
+            document.getElementById('totalStops').textContent = tripData.itinerary.length;
+            document.getElementById('totalDistance').textContent = tripData.totalDistance || '0';
+            document.getElementById('estimatedCost').textContent = tripData.estimatedCost || '$0';
+        }
+
+        function showError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+        }
+
+        function getBudgetDisplay(budget) {
+            const budgetMap = {
+                0: 'Free',
+                1: '$',
+                2: '$$',
+                3: '$$$',
+                4: '$$$$'
+            };
+            return budgetMap[budget] || '$$';
+        }
+
+        function shareTrip() {
+            document.getElementById('shareModal').style.display = 'block';
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
+        }
+
+        function copyShareLink() {
+            const shareUrl = document.getElementById('shareUrl');
+            shareUrl.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = event.target.closest('button');
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+            }, 2000);
+        }
+
+        function generateQRCode(url) {
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+            QRCode.toCanvas(qrContainer, url, { width: 200 }, function (error) {
+                if (error) console.error(error);
+            });
+        }
+
+        function shareToTwitter() {
+            const text = `Check out this amazing trip itinerary created with MoodYatra!`;
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`, '_blank');
+        }
+
+        function shareToFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareToWhatsApp() {
+            const text = `Check out this amazing trip itinerary: ${window.location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadTrip);
+
+        function toggleMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            mobileNav.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileNav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (!mobileNav.contains(event.target) && !toggle.contains(event.target)) {
+                mobileNav.classList.remove('active');
+                toggle.classList.remove('active');
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('shareModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

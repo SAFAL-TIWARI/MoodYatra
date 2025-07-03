@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodYatra - Spontaneous Trip Generator</title>
+    <meta name="description"
+        content="AI-powered micro-trip generator for spontaneous travelers. Just pick your mood, and we'll create the perfect local adventure.">
+    <meta name="author" content="MoodYatra Team">
+    <meta name="keywords" content="spontaneous trip, travel, adventure, micro-trip, AI, MoodYatra">
+    <meta name="og:title" content="MoodYatra - Spontaneous Trip Generator">
+    <meta name="og:description"
+        content="AI-powered micro-trip generator for spontaneous travelers. Just pick your mood, and we'll create the perfect local adventure.">
+    <meta name="og:image" content="https://example.com/MoodYatra-logo.png">
+    <meta name="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MoodYatra - Spontaneous Trip Generator">
+    <meta name="twitter:description"
+        content="AI-powered micro-trip generator for spontaneous travelers. Just pick your mood, and we'll create the perfect local adventure.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav">
+            <div class="logo neon-glow">
+                <i class="fas fa-compass"></i>
+                <span>MoodYatra</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-links desktop-nav">
+                <a href="#" class="nav-link">My Trips</a>
+                <a href="#" class="nav-link">Explore</a>
+                <a href="#" class="nav-link">Travel Guide</a>
+                <a href="#" class="nav-link">Contact</a>
+                <button class="btn-secondary" onclick="showAuthModal()">Sign In</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div class="mobile-nav" id="mobileNav">
+            <div class="mobile-nav-content">
+                <a href="#" class="mobile-nav-link">My Trips</a>
+                <a href="#" class="mobile-nav-link">Explore</a>
+                <a href="#" class="mobile-nav-link">Travel Guide</a>
+                <a href="#" class="mobile-nav-link">Contact</a>
+                <button class="btn-secondary mobile-signin" onclick="showAuthModal()">Sign In</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-background"></div>
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Discover Amazing
+                    <span class="gradient-text">Short Trips</span>
+                </h1>
+                <p class="hero-subtitle">
+                    AI-powered travel companion for spontaneous adventurers.
+                    Choose your vibe and discover hidden gems, local experiences, and unforgettable moments just around
+                    the corner.
+                </p>
+
+                <!-- Adventure & Fun Section -->
+                <!-- <div class="adventure-section">
+                    <div class="adventure-icon">🎯</div>
+                    <h3 class="adventure-title">Adventure & Fun</h3>
+                    <p class="adventure-description">Thrilling activities, entertainment, and exciting discoveries</p>
+                    <div class="beach-icon">🏖️</div>
+                </div> -->
+
+                <!-- Get Started Button -->
+                <div class="cta-section">
+                    <button class="btn-get-started" onclick="startTrip('adventure')">
+                        <span>Get Started</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="hero-features">
+                    <div class="feature">
+                        <i class="fas fa-robot"></i>
+                        <span>AI-Powered</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Local Insights</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Share & Save</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            <div class="auth-container">
+                <h2>Sign In to Save Your Trips</h2>
+                <p>No account needed to generate trips, but sign in to save and sync them!</p>
+
+                <form id="authForm" class="auth-form">
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <button class="btn-google" onclick="signInWithGoogle()">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </button>
+
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        function startTrip(mood) {
+            // Store selected mood and redirect to app
+            localStorage.setItem('selectedMood', mood);
+            window.location.href = 'app.html';
+        }
+
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        function toggleMobileMenu() {
+            const mobileNav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+
+            mobileNav.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('authModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function (event) {
+            const mobileNav = document.getElementById('mobileNav');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+
+            if (!mobileNav.contains(event.target) && !toggle.contains(event.target)) {
+                mobileNav.classList.remove('active');
+                toggle.classList.remove('active');
+            }
+        });
+
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+
+</html>
