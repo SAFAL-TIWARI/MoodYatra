@@ -113,7 +113,7 @@ class MoodYatraApp {
         
         if (!budgetSlider || !budgetDisplay) return;
 
-        const budgetLabels = ['Free', 'Budget ($)', 'Moderate ($$)', 'Premium ($$$)', 'Luxury ($$$$)'];
+        const budgetLabels = ['Free', 'Budget (₹)', 'Moderate (₹₹)', 'Premium (₹₹₹)', 'Luxury (₹₹₹₹)'];
         const value = parseInt(budgetSlider.value);
         budgetDisplay.textContent = budgetLabels[value];
         this.tripData.budget = value;
@@ -293,25 +293,22 @@ class MoodYatraApp {
     }
 
     async callGeminiAPI() {
-        const prompt = this.buildGeminiPrompt();
-        
         try {
-            const response = await fetch('/api/generate-trip', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    tripData: this.tripData
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to generate trip');
+            // Use the Gemini AI class directly
+            if (window.geminiAI) {
+                const result = await window.geminiAI.generateTrip(this.tripData);
+                return {
+                    title: result.title,
+                    description: result.description,
+                    places: result.itinerary || result.places,
+                    totalDistance: result.totalDistance,
+                    estimatedCost: result.estimatedCost,
+                    transportationTips: result.transportationTips,
+                    additionalTips: result.additionalTips
+                };
+            } else {
+                throw new Error('Gemini AI not initialized');
             }
-
-            return await response.json();
         } catch (error) {
             console.error('Gemini API error:', error);
             // Fallback to mock data for demo
@@ -349,7 +346,7 @@ class MoodYatraApp {
     }
 
     getMockTripData() {
-        // Mock data for demo purposes
+        // Mock data for demo purposes - using locations around the user's specified location
         const moodTitles = {
             fun: 'Epic Adventure Day',
             chill: 'Peaceful Relaxation Day',
@@ -357,53 +354,52 @@ class MoodYatraApp {
             romantic: 'Romantic Escape Day'
         };
 
+        // Generate places based on the user's location
+        const baseLocation = this.tripData.location || 'New York City';
+        
         return {
             title: moodTitles[this.tripData.mood] || 'Amazing Day Trip',
             description: `A perfect ${this.tripData.mood} day planned just for you in ${this.tripData.location}.`,
             places: [
                 {
-                    name: 'Local Park',
+                    name: `${baseLocation} Central Park`,
                     type: 'Park',
                     time: '10:00 AM',
                     duration: '2 hours',
                     description: 'Beautiful park perfect for morning activities',
                     cost: 'Free',
-                    lat: 40.7128,
-                    lng: -74.0060
+                    address: `Central Park, ${baseLocation}`
                 },
                 {
-                    name: 'Cozy Cafe',
+                    name: `Local Cafe in ${baseLocation}`,
                     type: 'Restaurant',
                     time: '12:30 PM',
                     duration: '1 hour',
                     description: 'Perfect spot for lunch with local flavors',
-                    cost: '$15-25',
-                    lat: 40.7589,
-                    lng: -73.9851
+                    cost: '₹15-25',
+                    address: `Popular cafe near ${baseLocation}`
                 },
                 {
-                    name: 'Art Gallery',
+                    name: `${baseLocation} Art Gallery`,
                     type: 'Cultural',
                     time: '2:00 PM',
                     duration: '1.5 hours',
                     description: 'Local art and cultural exhibitions',
-                    cost: '$10',
-                    lat: 40.7505,
-                    lng: -73.9934
+                    cost: '₹10',
+                    address: `Art gallery in ${baseLocation}`
                 },
                 {
-                    name: 'Scenic Viewpoint',
+                    name: `${baseLocation} Scenic Viewpoint`,
                     type: 'Attraction',
                     time: '4:00 PM',
                     duration: '1 hour',
                     description: 'Amazing views perfect for photos',
                     cost: 'Free',
-                    lat: 40.7614,
-                    lng: -73.9776
+                    address: `Scenic viewpoint near ${baseLocation}`
                 }
             ],
             totalDistance: '12.5',
-            estimatedCost: '$35-50'
+            estimatedCost: '₹35-50'
         };
     }
 
@@ -428,13 +424,41 @@ class MoodYatraApp {
         document.getElementById('tripBudget').textContent = this.getBudgetDisplay(this.generatedTrip.budget);
         document.getElementById('tripMood').textContent = this.capitalizeMood(this.generatedTrip.mood);
 
+        // Update summary information
+        if (this.generatedTrip.totalDistance) {
+            const distanceElement = document.getElementById('totalDistance');
+            if (distanceElement) {
+                distanceElement.innerHTML = `<i class="fas fa-route"></i><span>${this.generatedTrip.totalDistance}</span>`;
+            }
+        }
+
+        if (this.generatedTrip.estimatedCost) {
+            const costElement = document.getElementById('estimatedCost');
+            if (costElement) {
+                costElement.textContent = this.generatedTrip.estimatedCost;
+            }
+        }
+
         // Display itinerary
         this.displayItinerary();
 
-        // Initialize map
-        if (window.initializeMap) {
-            window.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
-        }
+        // Initialize map with enhanced functionality
+        setTimeout(() => {
+            if (window.mapsManager && window.mapsManager.initializeMap) {
+                console.log('Initializing map with trip data');
+                window.mapsManager.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
+            } else if (window.initializeMap) {
+                window.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
+            } else {
+                console.warn('Map initialization function not available');
+                // Retry after a longer delay
+                setTimeout(() => {
+                    if (window.mapsManager && window.mapsManager.initializeMap) {
+                        window.mapsManager.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
+                    }
+                }, 1000);
+            }
+        }, 500); // Increased delay to ensure Google Maps API is loaded
     }
 
     displayItinerary() {
@@ -448,19 +472,73 @@ class MoodYatraApp {
             itemElement.className = 'itinerary-item slide-up';
             itemElement.style.animationDelay = `${index * 0.1}s`;
             
+            // Create a more detailed itinerary item
             itemElement.innerHTML = `
-                <div class="item-time">${place.time}</div>
-                <div class="item-content">
-                    <h3>${place.name}</h3>
-                    <p>${place.description}</p>
-                    <div class="item-details">
-                        <span class="item-type">${place.type}</span>
-                        <span class="item-duration">${place.duration}</span>
-                        ${place.cost ? `<span class="item-cost">${place.cost}</span>` : ''}
-                        ${place.rating ? `<span class="item-rating">⭐ ${place.rating}</span>` : ''}
+                <div class="item-number">${index + 1}</div>
+                <div class="item-main">
+                    <div class="item-header">
+                        <div class="item-time-info">
+                            <div class="item-time">${place.time}</div>
+                            <div class="item-duration">${place.duration}</div>
+                        </div>
+                        <div class="item-title-section">
+                            <h3 class="item-name">${place.name}</h3>
+                            <span class="item-type">${place.type}</span>
+                        </div>
+                    </div>
+                    
+                    ${place.image ? `
+                        <div class="item-image">
+                            <img src="${place.image}" alt="${place.name}" loading="lazy" 
+                                 onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                        </div>
+                    ` : ''}
+                    
+                    <div class="item-content">
+                        <p class="item-description">${place.description}</p>
+                        
+                        <div class="item-details">
+                            ${place.cost ? `
+                                <div class="detail-item">
+                                    <i class="fas fa-rupee-sign"></i>
+                                    <span>${place.cost}</span>
+                                </div>
+                            ` : ''}
+                            ${place.rating ? `
+                                <div class="detail-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>${place.rating} ${place.reviews ? `(${place.reviews} reviews)` : ''}</span>
+                                </div>
+                            ` : ''}
+                            ${place.address ? `
+                                <div class="detail-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${place.address}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${place.tips ? `
+                            <div class="item-tips">
+                                <i class="fas fa-lightbulb"></i>
+                                <span><strong>Tip:</strong> ${place.tips}</span>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="item-actions">
+                            <button class="action-btn" onclick="app.focusOnPlace(${index})" title="Show on map">
+                                <i class="fas fa-map-marked-alt"></i>
+                                Show on Map
+                            </button>
+                            ${place.address ? `
+                                <button class="action-btn" onclick="app.getDirections('${place.address}')" title="Get directions">
+                                    <i class="fas fa-directions"></i>
+                                    Directions
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>
-                ${place.image ? `<div class="item-image"><img src="${place.image}" alt="${place.name}" loading="lazy"></div>` : ''}
             `;
             
             container.appendChild(itemElement);
@@ -470,12 +548,12 @@ class MoodYatraApp {
     getBudgetDisplay(budget) {
         const budgetMap = {
             0: 'Free',
-            1: '$',
-            2: '$$',
-            3: '$$$',
-            4: '$$$$'
+            1: '₹',
+            2: '₹₹',
+            3: '₹₹₹',
+            4: '₹₹₹₹'
         };
-        return budgetMap[budget] || '$$';
+        return budgetMap[budget] || '₹₹';
     }
 
     capitalizeMood(mood) {
@@ -573,6 +651,29 @@ class MoodYatraApp {
 
         // Show modal
         document.getElementById('shareModal').style.display = 'block';
+    }
+
+    // Focus on a specific place on the map
+    focusOnPlace(index) {
+        if (!this.generatedTrip || !this.generatedTrip.places[index]) return;
+        
+        const place = this.generatedTrip.places[index];
+        if (window.mapsManager && window.mapsManager.map) {
+            const position = { lat: place.lat, lng: place.lng };
+            window.mapsManager.map.setCenter(position);
+            window.mapsManager.map.setZoom(16);
+            
+            // Trigger marker click to show info window
+            if (window.mapsManager.markers[index]) {
+                google.maps.event.trigger(window.mapsManager.markers[index], 'click');
+            }
+        }
+    }
+
+    // Get directions to a place
+    getDirections(address) {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+        window.open(url, '_blank');
     }
 }
 

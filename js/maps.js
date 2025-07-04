@@ -13,11 +13,14 @@ class MapsManager {
 
     init() {
         // Initialize when Google Maps API is loaded
-        if (typeof google !== 'undefined') {
+        if (typeof google !== 'undefined' && google.maps) {
             this.initializeServices();
         } else {
             // Wait for Google Maps to load
-            window.initMaps = () => this.initializeServices();
+            window.initMaps = () => {
+                console.log('Google Maps API loaded');
+                this.initializeServices();
+            };
         }
     }
 
@@ -42,9 +45,20 @@ class MapsManager {
             return;
         }
 
+        // Check if Google Maps is loaded
+        if (typeof google === 'undefined' || !google.maps) {
+            console.error('Google Maps API not loaded');
+            this.showMapError();
+            return;
+        }
+
         try {
+            console.log('Initializing map with places:', places);
+            console.log('Center location:', centerLocation);
+            
             // Get center coordinates
             const center = await this.getCoordinates(centerLocation);
+            console.log('Center coordinates:', center);
             
             // Initialize map
             this.map = new google.maps.Map(mapContainer, {
@@ -56,6 +70,8 @@ class MapsManager {
                 fullscreenControl: true,
                 zoomControl: true
             });
+
+            console.log('Map initialized successfully');
 
             // Set directions renderer
             this.directionsRenderer.setMap(this.map);
@@ -83,17 +99,21 @@ class MapsManager {
     async getCoordinates(location) {
         return new Promise((resolve, reject) => {
             if (!this.geocoder) {
-                // Fallback coordinates
+                console.warn('Geocoder not available, using fallback coordinates');
+                // Fallback coordinates (New York City)
                 resolve({ lat: 40.7128, lng: -74.0060 });
                 return;
             }
 
+            console.log('Geocoding location:', location);
             this.geocoder.geocode({ address: location }, (results, status) => {
                 if (status === 'OK' && results[0]) {
-                    resolve(results[0].geometry.location.toJSON());
+                    const coords = results[0].geometry.location.toJSON();
+                    console.log('Geocoding successful:', coords);
+                    resolve(coords);
                 } else {
-                    console.warn('Geocoding failed:', status);
-                    // Fallback to default coordinates
+                    console.warn('Geocoding failed:', status, 'for location:', location);
+                    // Fallback to default coordinates (New York City)
                     resolve({ lat: 40.7128, lng: -74.0060 });
                 }
             });
@@ -104,19 +124,31 @@ class MapsManager {
         // Clear existing markers
         this.clearMarkers();
 
+        console.log('Adding markers for places:', places);
+
         for (let i = 0; i < places.length; i++) {
             const place = places[i];
             let coordinates;
 
-            // Use provided coordinates or geocode the address
+            // Use provided coordinates or geocode the address/name
             if (place.lat && place.lng) {
-                coordinates = { lat: place.lat, lng: place.lng };
+                coordinates = { lat: parseFloat(place.lat), lng: parseFloat(place.lng) };
+                console.log(`Using existing coordinates for ${place.name}:`, coordinates);
             } else if (place.address) {
                 coordinates = await this.getCoordinates(place.address);
+                console.log(`Geocoded address for ${place.name}:`, coordinates);
+            } else if (place.name) {
+                // Try to geocode using place name
+                coordinates = await this.getCoordinates(place.name);
+                console.log(`Geocoded name for ${place.name}:`, coordinates);
             } else {
-                // Skip if no location data
+                console.warn(`No location data for place ${i + 1}:`, place);
                 continue;
             }
+
+            // Update place with coordinates
+            place.lat = coordinates.lat;
+            place.lng = coordinates.lng;
 
             // Create custom marker
             const marker = new google.maps.Marker({
@@ -126,6 +158,8 @@ class MapsManager {
                 icon: this.createCustomMarker(i + 1, place.type),
                 animation: google.maps.Animation.DROP
             });
+
+            console.log(`Created marker ${i + 1} for ${place.name} at:`, coordinates);
 
             // Create info window content
             const infoContent = this.createInfoWindowContent(place, i + 1);
@@ -141,32 +175,46 @@ class MapsManager {
             // Enhance place data with Google Places details
             await this.enhancePlaceData(place, coordinates);
         }
+
+        console.log(`Added ${this.markers.length} markers to the map`);
     }
 
     createCustomMarker(number, type) {
         // Create custom marker based on place type
         const colors = {
             'Restaurant': '#e74c3c',
+            'Food & Dining': '#e74c3c',
+            'Cafe': '#e74c3c',
             'Park': '#27ae60',
+            'Nature': '#27ae60',
+            'Hiking': '#27ae60',
+            'Garden': '#27ae60',
             'Museum': '#9b59b6',
+            'Cultural': '#9b59b6',
+            'Gallery': '#9b59b6',
             'Entertainment': '#f39c12',
             'Shopping': '#3498db',
-            'Cultural': '#8e44ad',
             'Nightlife': '#e67e22',
             'Wellness': '#1abc9c',
+            'Spa': '#1abc9c',
+            'Wine Bar': '#8e44ad',
+            'Scenic Spot': '#27ae60',
             'default': '#667eea'
         };
 
         const color = colors[type] || colors.default;
 
+        // Create a custom marker with number
         return {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: color,
-            fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 2,
-            scale: 12,
-            labelOrigin: new google.maps.Point(0, 0)
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                <svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 0C7.163 0 0 7.163 0 16c0 16 16 24 16 24s16-8 16-24C32 7.163 24.837 0 16 0z" fill="${color}"/>
+                    <circle cx="16" cy="16" r="12" fill="white"/>
+                    <text x="16" y="21" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="${color}">${number}</text>
+                </svg>
+            `)}`,
+            scaledSize: new google.maps.Size(32, 40),
+            anchor: new google.maps.Point(16, 40)
         };
     }
 
@@ -190,7 +238,7 @@ class MapsManager {
                         </div>
                         ${place.cost ? `
                             <div class="info-cost">
-                                <i class="fas fa-dollar-sign"></i>
+                                <i class="fas fa-rupee-sign"></i>
                                 <span>${place.cost}</span>
                             </div>
                         ` : ''}
@@ -223,8 +271,8 @@ class MapsManager {
         // Search for place details using Google Places API
         const request = {
             location: coordinates,
-            radius: 100,
-            query: place.name
+            radius: 500, // Increased radius for better results
+            query: place.name + ' ' + place.type
         };
 
         return new Promise((resolve) => {
@@ -232,18 +280,64 @@ class MapsManager {
                 if (status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
                     const placeResult = results[0];
                     
-                    // Enhance place data
+                    // Enhance place data with real Google Places data
                     if (!place.rating && placeResult.rating) {
                         place.rating = placeResult.rating.toFixed(1);
                     }
                     if (!place.reviews && placeResult.user_ratings_total) {
                         place.reviews = placeResult.user_ratings_total;
                     }
-                    if (!place.image && placeResult.photos && placeResult.photos[0]) {
-                        place.image = placeResult.photos[0].getUrl({ maxWidth: 300, maxHeight: 200 });
+                    if (placeResult.photos && placeResult.photos[0]) {
+                        place.image = placeResult.photos[0].getUrl({ 
+                            maxWidth: 400, 
+                            maxHeight: 300 
+                        });
                     }
                     if (!place.address && placeResult.formatted_address) {
                         place.address = placeResult.formatted_address;
+                    }
+                    
+                    // Update coordinates with more accurate data
+                    if (placeResult.geometry && placeResult.geometry.location) {
+                        place.lat = placeResult.geometry.location.lat();
+                        place.lng = placeResult.geometry.location.lng();
+                    }
+                    
+                    // Get additional details if place_id is available
+                    if (placeResult.place_id) {
+                        this.getPlaceDetails(placeResult.place_id, place);
+                    }
+                }
+                resolve();
+            });
+        });
+    }
+
+    async getPlaceDetails(placeId, place) {
+        if (!this.placesService) return;
+
+        const request = {
+            placeId: placeId,
+            fields: ['name', 'rating', 'user_ratings_total', 'photos', 'formatted_address', 
+                    'opening_hours', 'price_level', 'website', 'formatted_phone_number']
+        };
+
+        return new Promise((resolve) => {
+            this.placesService.getDetails(request, (placeDetails, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && placeDetails) {
+                    // Add more detailed information
+                    if (placeDetails.opening_hours) {
+                        place.openingHours = placeDetails.opening_hours.weekday_text;
+                        place.isOpen = placeDetails.opening_hours.isOpen();
+                    }
+                    if (placeDetails.price_level !== undefined) {
+                        place.priceLevel = placeDetails.price_level;
+                    }
+                    if (placeDetails.website) {
+                        place.website = placeDetails.website;
+                    }
+                    if (placeDetails.formatted_phone_number) {
+                        place.phone = placeDetails.formatted_phone_number;
                     }
                 }
                 resolve();
@@ -437,7 +531,10 @@ class MapsManager {
                 <div class="map-error">
                     <i class="fas fa-exclamation-triangle"></i>
                     <h3>Map Unavailable</h3>
-                    <p>Unable to load the map. Please check your internet connection.</p>
+                    <p>Unable to load the map. Please check your internet connection and try refreshing the page.</p>
+                    <button onclick="location.reload()" class="retry-btn">
+                        <i class="fas fa-redo"></i> Retry
+                    </button>
                 </div>
             `;
         }
@@ -466,6 +563,78 @@ class MapsManager {
             });
         });
     }
+
+    // Toggle map view between roadmap and satellite
+    toggleMapView() {
+        if (!this.map) return;
+        
+        const currentType = this.map.getMapTypeId();
+        const newType = currentType === 'roadmap' ? 'satellite' : 'roadmap';
+        this.map.setMapTypeId(newType);
+        
+        // Update button text
+        const toggleBtn = document.getElementById('mapViewToggle');
+        if (toggleBtn) {
+            const icon = toggleBtn.querySelector('i');
+            const text = toggleBtn.childNodes[1];
+            if (newType === 'satellite') {
+                icon.className = 'fas fa-map';
+                text.textContent = ' Roadmap';
+            } else {
+                icon.className = 'fas fa-satellite';
+                text.textContent = ' Satellite';
+            }
+        }
+    }
+
+    // Center map to show all markers
+    centerMap() {
+        if (!this.map || this.markers.length === 0) return;
+        this.fitMapToMarkers();
+    }
+
+    // Search for nearby places
+    searchNearbyPlaces(location, type = 'restaurant') {
+        if (!this.placesService) return;
+
+        const request = {
+            location: location,
+            radius: 1000,
+            type: [type]
+        };
+
+        this.placesService.nearbySearch(request, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                // Display nearby places in a modal or sidebar
+                this.displayNearbyPlaces(results, type);
+            }
+        });
+    }
+
+    displayNearbyPlaces(places, type) {
+        // Create a simple display of nearby places
+        const nearbyContainer = document.createElement('div');
+        nearbyContainer.className = 'nearby-places-container';
+        nearbyContainer.innerHTML = `
+            <div class="nearby-header">
+                <h4>Nearby ${type.charAt(0).toUpperCase() + type.slice(1)}s</h4>
+                <button onclick="this.parentElement.parentElement.remove()" class="close-btn">×</button>
+            </div>
+            <div class="nearby-list">
+                ${places.slice(0, 5).map(place => `
+                    <div class="nearby-item">
+                        <h5>${place.name}</h5>
+                        <div class="nearby-rating">
+                            ${place.rating ? `⭐ ${place.rating}` : 'No rating'}
+                        </div>
+                        <div class="nearby-address">${place.vicinity}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        document.body.appendChild(nearbyContainer);
+    }
 }
 
 // Global functions
@@ -481,9 +650,32 @@ function reverseGeocode(lat, lng) {
     }
 }
 
+function toggleMapView() {
+    if (window.mapsManager) {
+        window.mapsManager.toggleMapView();
+    }
+}
+
+function centerMap() {
+    if (window.mapsManager) {
+        window.mapsManager.centerMap();
+    }
+}
+
+// Global callback for Google Maps API
+window.initMaps = function() {
+    console.log('Google Maps API loaded, initializing MapsManager');
+    if (!window.mapsManager) {
+        window.mapsManager = new MapsManager();
+    }
+    window.mapsManager.initializeServices();
+};
+
 // Initialize maps manager
 document.addEventListener('DOMContentLoaded', () => {
-    window.mapsManager = new MapsManager();
+    if (!window.mapsManager) {
+        window.mapsManager = new MapsManager();
+    }
 });
 
 // Add CSS for info windows
@@ -613,6 +805,22 @@ mapStyles.textContent = `
     .map-error h3 {
         margin-bottom: 0.5rem;
         color: #333;
+    }
+
+    .retry-btn {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+    }
+
+    .retry-btn:hover {
+        background: #5a6fd8;
     }
 `;
 document.head.appendChild(mapStyles);

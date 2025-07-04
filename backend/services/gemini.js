@@ -41,7 +41,7 @@ class GeminiService {
 
     buildPrompt(tripData) {
         const { mood, location, duration, budget, preferences } = tripData;
-        const budgetLabels = ['free activities', 'budget-friendly ($)', 'moderate ($$)', 'premium ($$$)', 'luxury ($$$$)'];
+        const budgetLabels = ['free activities', 'budget-friendly (₹)', 'moderate (₹₹)', 'premium (₹₹₹)', 'luxury (₹₹₹₹)'];
         const budgetText = budgetLabels[budget] || 'moderate';
 
         let preferencesText = '';
@@ -77,7 +77,7 @@ Please create a realistic, well-timed itinerary with actual places in ${location
             "time": "Start time (e.g., 10:00 AM)",
             "duration": "Time to spend (e.g., 2 hours)",
             "description": "What to do there and why it fits the ${mood} mood (2-3 sentences)",
-            "cost": "Price range (Free, $5-15, $15-30, etc.) or 'Free'",
+            "cost": "Price range (Free, ₹5-15, ₹15-30, etc.) or 'Free'",
             "address": "Full street address if known, or general area",
             "tips": "Helpful insider tip or practical advice"
         }
@@ -172,7 +172,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '10:00 AM',
                     duration: '2.5 hours',
                     description: 'Start your day with thrilling rides and exciting activities that will get your adrenaline pumping. Perfect for adventure seekers looking for high-energy fun.',
-                    cost: '$25-35',
+                    cost: '₹25-35',
                     address: '123 Adventure Blvd',
                     tips: 'Arrive early to avoid crowds and get the best ride times'
                 },
@@ -182,7 +182,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '1:00 PM',
                     duration: '1.5 hours',
                     description: 'Explore a vibrant market filled with diverse food vendors and local specialties. Great for trying new flavors and experiencing local culture.',
-                    cost: '$15-25',
+                    cost: '₹15-25',
                     address: '456 Market Street',
                     tips: 'Try the local street food specialties and bring cash for smaller vendors'
                 },
@@ -192,7 +192,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '3:30 PM',
                     duration: '2 hours',
                     description: 'Engage with hands-on exhibits and interactive displays that make learning fun and exciting. Perfect for curious minds and group activities.',
-                    cost: '$12-18',
+                    cost: '₹12-18',
                     address: '789 Museum Ave',
                     tips: 'Check for special exhibitions and interactive workshops'
                 },
@@ -202,7 +202,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '6:00 PM',
                     duration: '2 hours',
                     description: 'End your adventure with amazing city views, craft cocktails, and a lively atmosphere. Perfect for celebrating an exciting day.',
-                    cost: '$30-50',
+                    cost: '₹30-50',
                     address: '321 Sky Tower',
                     tips: 'Make a reservation for the best sunset views'
                 }
@@ -214,7 +214,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '10:00 AM',
                     duration: '2 hours',
                     description: 'Wander through peaceful gardens filled with beautiful flowers and quiet walking paths. Perfect for meditation and connecting with nature.',
-                    cost: '$8-12',
+                    cost: '₹8-12',
                     address: '100 Garden Lane',
                     tips: 'Visit the rose garden and bring a book to read by the pond'
                 },
@@ -224,7 +224,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '12:30 PM',
                     duration: '1.5 hours',
                     description: 'Relax in a quiet cafe surrounded by books, with excellent coffee and comfortable seating. Ideal for unwinding and people-watching.',
-                    cost: '$10-15',
+                    cost: '₹10-15',
                     address: '234 Literary St',
                     tips: 'Try their signature latte and browse the local authors section'
                 },
@@ -234,7 +234,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '2:30 PM',
                     duration: '1.5 hours',
                     description: 'Explore serene gallery spaces featuring local and contemporary art in a peaceful, contemplative environment.',
-                    cost: '$5-10',
+                    cost: '₹5-10',
                     address: '567 Arts District',
                     tips: 'Free admission on first Fridays, and they often have artist talks'
                 },
@@ -244,7 +244,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '4:30 PM',
                     duration: '2 hours',
                     description: 'Indulge in relaxing treatments and peaceful atmosphere for the ultimate unwinding experience. Perfect end to a chill day.',
-                    cost: '$40-80',
+                    cost: '₹40-80',
                     address: '890 Wellness Way',
                     tips: 'Book treatments in advance and arrive 15 minutes early'
                 }
@@ -266,7 +266,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '12:30 PM',
                     duration: '1.5 hours',
                     description: 'Enjoy lunch with stunning lake views and fresh air. Perfect spot for relaxation and taking in natural beauty.',
-                    cost: '$5 parking',
+                    cost: '₹5 parking',
                     address: 'Crystal Lake Park',
                     tips: 'Pack a picnic or grab food from the nearby deli'
                 },
@@ -276,7 +276,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '2:30 PM',
                     duration: '2 hours',
                     description: 'Learn about local wildlife and conservation efforts while observing native animals in their natural habitats.',
-                    cost: '$8-15',
+                    cost: '₹8-15',
                     address: '456 Conservation Dr',
                     tips: 'Check feeding times for the best wildlife viewing opportunities'
                 },
@@ -298,7 +298,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '10:00 AM',
                     duration: '1.5 hours',
                     description: 'Stroll through romantic gardens with beautiful flowers, fountains, and intimate pathways perfect for couples.',
-                    cost: '$10-15',
+                    cost: '₹10-15',
                     address: '123 Romance Lane',
                     tips: 'Perfect for photos together, especially near the fountain'
                 },
@@ -308,7 +308,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '12:00 PM',
                     duration: '2 hours',
                     description: 'Enjoy an intimate wine tasting experience with local vintages and cheese pairings in a cozy, romantic setting.',
-                    cost: '$25-40',
+                    cost: '₹25-40',
                     address: '789 Vineyard St',
                     tips: 'Ask about private tastings and wine pairing recommendations'
                 },
@@ -318,7 +318,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '3:00 PM',
                     duration: '2 hours',
                     description: 'Relax together with couples massage and spa treatments in a romantic, peaceful environment designed for two.',
-                    cost: '$80-150',
+                    cost: '₹80-150',
                     address: '456 Serenity Ave',
                     tips: 'Book the couples suite and arrive early to enjoy the amenities'
                 },
@@ -328,7 +328,7 @@ Return ONLY the JSON object, no additional text or formatting.`;
                     time: '6:30 PM',
                     duration: '2 hours',
                     description: 'End your romantic day with exceptional cuisine in an elegant restaurant with intimate ambiance and attentive service.',
-                    cost: '$60-100',
+                    cost: '₹60-100',
                     address: '321 Gourmet Blvd',
                     tips: 'Request a table by the window and mention if it\'s a special occasion'
                 }
@@ -402,13 +402,13 @@ Return ONLY the JSON object, no additional text or formatting.`;
 
     getEstimatedCost(budget) {
         const costRanges = [
-            'Free - $10',
-            '$10 - $30',
-            '$30 - $75',
-            '$75 - $150',
-            '$150+'
+            'Free - ₹10',
+            '₹10 - ₹30',
+            '₹30 - ₹75',
+            '₹75 - ₹150',
+            '₹150+'
         ];
-        return costRanges[budget] || '$30 - $75';
+        return costRanges[budget] || '₹30 - ₹75';
     }
 
     generateTripId() {

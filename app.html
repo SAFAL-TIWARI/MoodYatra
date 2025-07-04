@@ -122,7 +122,7 @@
                             <div class="form-group">
                                 <label for="location">Starting Location</label>
                                 <div class="location-input">
-                                    <input type="text" id="location" placeholder="Enter your location">
+                                    <input type="text" id="location" placeholder="Enter your location" enterkeyhint="enter" >
                                     <button type="button" class="location-btn" onclick="getCurrentLocation()">
                                         <i class="fas fa-location-arrow"></i>
                                     </button>
@@ -234,15 +234,58 @@ Examples:
 
                             <div class="results-content">
                                 <div class="itinerary-section">
-                                    <h3>Your Itinerary</h3>
+                                    <div class="section-header">
+                                        <h3><i class="fas fa-list-ul"></i> Your Itinerary</h3>
+                                        <div class="trip-summary">
+                                            <span id="totalDistance" class="summary-item">
+                                                <i class="fas fa-route"></i>
+                                                <span>Calculating...</span>
+                                            </span>
+                                            <span id="totalCost" class="summary-item">
+                                                <i class="fas fa-rupee-sign"></i>
+                                                <span id="estimatedCost">₹0</span>
+                                            </span>
+                                        </div>
+                                    </div>
                                     <div id="itineraryList" class="itinerary-list">
                                         <!-- Itinerary items will be populated here -->
                                     </div>
                                 </div>
 
                                 <div class="map-section">
-                                    <h3>Your Route</h3>
+                                    <div class="section-header">
+                                        <h3><i class="fas fa-map-marked-alt"></i> Your Route</h3>
+                                        <div class="map-controls">
+                                            <button class="map-control-btn" onclick="toggleMapView()"
+                                                id="mapViewToggle">
+                                                <i class="fas fa-satellite"></i>
+                                                Satellite
+                                            </button>
+                                            <button class="map-control-btn" onclick="centerMap()">
+                                                <i class="fas fa-crosshairs"></i>
+                                                Center
+                                            </button>
+                                        </div>
+                                    </div>
                                     <div id="map" class="map-container"></div>
+                                    <div class="map-legend">
+                                        <div class="legend-item">
+                                            <div class="legend-marker cultural"></div>
+                                            <span>Cultural</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-marker restaurant"></div>
+                                            <span>Restaurant</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-marker park"></div>
+                                            <span>Park/Nature</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-marker entertainment"></div>
+                                            <span>Entertainment</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -341,7 +384,7 @@ Examples:
 
     <!-- Scripts -->
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMaps"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPccMzZV25BlUA1YtrDtLbqGzgPuuMU4A&libraries=places&callback=initMaps"
         async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     <script src="js/auth.js"></script>

@@ -95,6 +95,7 @@ temp/
 *.swp
 *.swo
 *~
+.zencoder/
 
 # OS generated files
 .DS_Store

@@ -7,9 +7,8 @@ class GeminiAI {
     }
 
     init() {
-        // In production, get API key from secure config
-        // For demo, we'll use a placeholder
-        this.apiKey = 'YOUR_GEMINI_API_KEY';
+        // Set the actual Gemini API key
+        this.apiKey = 'process.env.GEMINI_API_KEY';
     }
 
     async generateTrip(tripData) {
@@ -20,19 +19,25 @@ class GeminiAI {
         } catch (error) {
             console.error('Gemini API error:', error);
             // Return mock data as fallback
-            return this.getMockResponse(tripData);
+            return await this.getMockResponse(tripData);
         }
     }
 
     buildPrompt(tripData) {
-        const { mood, location, duration, budget, preferences } = tripData;
-        const budgetLabels = ['free activities', 'budget-friendly ($)', 'moderate ($$)', 'premium ($$$)', 'luxury ($$$$)'];
+        const { mood, location, duration, budget, preferences, customPrompt } = tripData;
+        const budgetLabels = ['free activities', 'budget-friendly (₹)', 'moderate (₹₹)', 'premium (₹₹₹)', 'luxury (₹₹₹₹)'];
         const budgetText = budgetLabels[budget] || 'moderate';
 
         let preferencesText = '';
         if (preferences.foodie) preferencesText += ' Focus on food experiences and local cuisine.';
         if (preferences.cultural) preferencesText += ' Include cultural attractions, museums, and historical sites.';
         if (preferences.shopping) preferencesText += ' Include shopping opportunities and local markets.';
+
+        // Add custom prompt if provided
+        let customInstructions = '';
+        if (customPrompt && customPrompt.trim()) {
+            customInstructions = `\n\nAdditional user requirements: ${customPrompt.trim()}`;
+        }
 
         const moodDescriptions = {
             fun: 'exciting, adventurous, and energetic activities',
@@ -42,7 +47,7 @@ class GeminiAI {
         };
 
         return `Create a detailed ${duration}-hour day trip itinerary for ${location} with a ${mood} mood focusing on ${moodDescriptions[mood]}. 
-                Budget level: ${budgetText}.${preferencesText}
+                Budget level: ${budgetText}.${preferencesText}${customInstructions}
                 
                 Please provide a JSON response with this exact structure:
                 {
@@ -75,7 +80,8 @@ class GeminiAI {
                 4. Stay within the ${budgetText} budget range
                 5. Consider travel time between locations
                 6. Include at least one meal recommendation
-                7. Provide practical, actionable advice`;
+                7. Provide practical, actionable advice
+                8. Follow any specific user requirements mentioned above`;
     }
 
     async callGeminiAPI(prompt) {
@@ -152,7 +158,7 @@ class GeminiAI {
         }
     }
 
-    getMockResponse(tripData) {
+    async getMockResponse(tripData) {
         const { mood, location, duration, budget } = tripData;
         
         const moodTitles = {
@@ -170,7 +176,7 @@ class GeminiAI {
                     time: '10:00 AM',
                     duration: '2.5 hours',
                     description: 'Thrilling rides and exciting activities to get your adrenaline pumping',
-                    cost: '$25-35',
+                    cost: '₹25-35',
                     tips: 'Arrive early to avoid crowds'
                 },
                 {
@@ -179,7 +185,7 @@ class GeminiAI {
                     time: '1:00 PM',
                     duration: '1.5 hours',
                     description: 'Vibrant market with diverse food vendors and local specialties',
-                    cost: '$15-25',
+                    cost: '₹15-25',
                     tips: 'Try the local street food specialties'
                 },
                 {
@@ -188,7 +194,7 @@ class GeminiAI {
                     time: '3:30 PM',
                     duration: '2 hours',
                     description: 'Hands-on exhibits and engaging displays perfect for exploration',
-                    cost: '$12-18',
+                    cost: '₹12-18',
                     tips: 'Check for special exhibitions'
                 },
                 {
@@ -197,7 +203,7 @@ class GeminiAI {
                     time: '6:00 PM',
                     duration: '2 hours',
                     description: 'Amazing city views with craft cocktails and lively atmosphere',
-                    cost: '$30-50',
+                    cost: '₹30-50',
                     tips: 'Make a reservation for sunset views'
                 }
             ],
@@ -208,7 +214,7 @@ class GeminiAI {
                     time: '10:00 AM',
                     duration: '2 hours',
                     description: 'Peaceful gardens with beautiful flowers and quiet walking paths',
-                    cost: '$8-12',
+                    cost: '₹8-12',
                     tips: 'Perfect for morning meditation'
                 },
                 {
@@ -217,7 +223,7 @@ class GeminiAI {
                     time: '12:30 PM',
                     duration: '1.5 hours',
                     description: 'Quiet cafe with great coffee, books, and comfortable seating',
-                    cost: '$10-15',
+                    cost: '₹10-15',
                     tips: 'Try their signature latte'
                 },
                 {
@@ -226,7 +232,7 @@ class GeminiAI {
                     time: '2:30 PM',
                     duration: '1.5 hours',
                     description: 'Serene gallery space featuring local and contemporary art',
-                    cost: '$5-10',
+                    cost: '₹5-10',
                     tips: 'Free admission on first Fridays'
                 },
                 {
@@ -235,7 +241,7 @@ class GeminiAI {
                     time: '4:30 PM',
                     duration: '2 hours',
                     description: 'Relaxing treatments and peaceful atmosphere for ultimate unwinding',
-                    cost: '$40-80',
+                    cost: '₹40-80',
                     tips: 'Book treatments in advance'
                 }
             ],
@@ -255,7 +261,7 @@ class GeminiAI {
                     time: '12:30 PM',
                     duration: '1.5 hours',
                     description: 'Perfect spot for lunch with stunning lake views and fresh air',
-                    cost: '$5 parking',
+                    cost: '₹5 parking',
                     tips: 'Pack a picnic or grab food nearby'
                 },
                 {
@@ -264,7 +270,7 @@ class GeminiAI {
                     time: '2:30 PM',
                     duration: '2 hours',
                     description: 'Educational center with native wildlife and conservation exhibits',
-                    cost: '$8-15',
+                    cost: '₹8-15',
                     tips: 'Check feeding times for best wildlife viewing'
                 },
                 {
@@ -284,7 +290,7 @@ class GeminiAI {
                     time: '10:00 AM',
                     duration: '1.5 hours',
                     description: 'Romantic garden with beautiful flowers, fountains, and intimate pathways',
-                    cost: '$10-15',
+                    cost: '₹10-15',
                     tips: 'Perfect for photos together'
                 },
                 {
@@ -293,7 +299,7 @@ class GeminiAI {
                     time: '12:00 PM',
                     duration: '2 hours',
                     description: 'Intimate wine tasting experience with local vintages and cheese pairings',
-                    cost: '$25-40',
+                    cost: '₹25-40',
                     tips: 'Ask about private tastings'
                 },
                 {
@@ -302,7 +308,7 @@ class GeminiAI {
                     time: '3:00 PM',
                     duration: '2 hours',
                     description: 'Relaxing couples massage and spa treatments in a romantic setting',
-                    cost: '$80-150',
+                    cost: '₹80-150',
                     tips: 'Book the couples suite'
                 },
                 {
@@ -311,7 +317,7 @@ class GeminiAI {
                     time: '6:30 PM',
                     duration: '2 hours',
                     description: 'Elegant restaurant with intimate ambiance and exceptional cuisine',
-                    cost: '$60-100',
+                    cost: '₹60-100',
                     tips: 'Request a table by the window'
                 }
             ]
@@ -319,15 +325,15 @@ class GeminiAI {
 
         const activities = moodActivities[mood] || moodActivities.fun;
 
-        // Add mock coordinates
-        const baseCoords = this.getLocationCoordinates(location);
+        // Add coordinates using geocoding
+        const baseCoords = await this.getLocationCoordinates(location);
         const itinerary = activities.map((activity, index) => ({
             ...activity,
             lat: baseCoords.lat + (Math.random() - 0.5) * 0.05,
             lng: baseCoords.lng + (Math.random() - 0.5) * 0.05,
             id: `place_${index}`,
             address: `${Math.floor(Math.random() * 999) + 1} Main St, ${location}`,
-            image: `https://picsum.photos/300/200?random=${Math.floor(Math.random() * 1000)}`,
+            image: `https://picsum.photos/400/300?random=${Math.floor(Math.random() * 1000)}`,
             rating: (Math.random() * 2 + 3).toFixed(1),
             reviews: Math.floor(Math.random() * 500) + 50
         }));
@@ -345,8 +351,26 @@ class GeminiAI {
         };
     }
 
-    getLocationCoordinates(location) {
-        // Mock coordinates for common cities (in production, use geocoding API)
+    async getLocationCoordinates(location) {
+        try {
+            // Use Google Geocoding API to get accurate coordinates
+            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+            
+            const response = await fetch(geocodeUrl);
+            const data = await response.json();
+            
+            if (data.status === 'OK' && data.results.length > 0) {
+                const result = data.results[0];
+                return {
+                    lat: result.geometry.location.lat,
+                    lng: result.geometry.location.lng
+                };
+            }
+        } catch (error) {
+            console.warn('Geocoding failed, using fallback coordinates:', error);
+        }
+
+        // Fallback coordinates for common cities
         const coordinates = {
             'New York': { lat: 40.7128, lng: -74.0060 },
             'Los Angeles': { lat: 34.0522, lng: -118.2437 },
@@ -373,13 +397,13 @@ class GeminiAI {
 
     getEstimatedCost(budget) {
         const costRanges = [
-            'Free - $10',
-            '$10 - $30',
-            '$30 - $75',
-            '$75 - $150',
-            '$150+'
+            'Free - ₹10',
+            '₹10 - ₹30',
+            '₹30 - ₹75',
+            '₹75 - ₹150',
+            '₹150+'
         ];
-        return costRanges[budget] || '$30 - $75';
+        return costRanges[budget] || '₹30 - ₹75';
     }
 }
 
