@@ -44,7 +44,7 @@ class MoodYatraApp {
         const locationInput = document.getElementById('location');
         if (locationInput) {
             locationInput.addEventListener('input', () => {
-                this.validateStep2();
+                this.validateStep1();
             });
             
             // Listen for location selection from autocomplete
@@ -100,11 +100,8 @@ class MoodYatraApp {
 
         this.tripData.mood = mood;
         
-        // Enable next button
-        const nextBtn = document.getElementById('nextBtn1');
-        if (nextBtn) {
-            nextBtn.disabled = false;
-        }
+        // Validate step 1 (now includes both mood and location)
+        this.validateStep1();
     }
 
     updateBudgetDisplay() {
@@ -155,12 +152,13 @@ class MoodYatraApp {
         }
     }
 
-    validateStep2() {
+    validateStep1() {
         const location = document.getElementById('location')?.value.trim();
-        const nextBtn = document.getElementById('nextBtn2');
+        const mood = this.tripData.mood;
+        const nextBtn = document.getElementById('nextBtn1');
         
         if (nextBtn) {
-            nextBtn.disabled = !location;
+            nextBtn.disabled = !location || !mood;
         }
         
         if (location) {
@@ -181,25 +179,24 @@ class MoodYatraApp {
         this.tripData.location = detail.mainText;
         
         // Validate the step
-        this.validateStep2();
+        this.validateStep1();
         
         console.log('Location selected:', this.tripData.locationDetails);
     }
 
     nextStep() {
         if (this.currentStep === 1) {
-            if (!this.tripData.mood) {
-                alert('Please select a mood for your trip!');
-                return;
-            }
-            this.goToStep(2);
-        } else if (this.currentStep === 2) {
+            // Validate all required fields for step 1
             if (!this.tripData.location.trim()) {
                 alert('Please enter your starting location!');
                 return;
             }
+            if (!this.tripData.mood) {
+                alert('Please select a mood for your trip!');
+                return;
+            }
             this.collectFormData();
-            this.goToStep(3);
+            this.goToStep(2);
             this.generateTrip();
         }
     }
@@ -245,7 +242,7 @@ class MoodYatraApp {
             // Generate trip using Gemini AI
             const generatedTrip = await this.callGeminiAPI();
             
-            // Get places data from Google Maps
+            // Get places data from open source services
             const placesData = await this.getPlacesData(generatedTrip.places);
             
             // Combine data
@@ -439,26 +436,56 @@ class MoodYatraApp {
             }
         }
 
+        // Display trip summary
+        this.displayTripSummary();
+
         // Display itinerary
         this.displayItinerary();
 
         // Initialize map with enhanced functionality
         setTimeout(() => {
             if (window.mapsManager && window.mapsManager.initializeMap) {
-                console.log('Initializing map with trip data');
-                window.mapsManager.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
-            } else if (window.initializeMap) {
-                window.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
+                console.log('Initializing Leaflet map with trip data');
+                window.mapsManager.initializeMap(this.generatedTrip.itinerary || this.generatedTrip.places);
             } else {
-                console.warn('Map initialization function not available');
+                console.warn('Leaflet Maps Manager not available');
                 // Retry after a longer delay
                 setTimeout(() => {
                     if (window.mapsManager && window.mapsManager.initializeMap) {
-                        window.mapsManager.initializeMap(this.generatedTrip.places, this.generatedTrip.location);
+                        window.mapsManager.initializeMap(this.generatedTrip.itinerary || this.generatedTrip.places);
                     }
                 }, 1000);
             }
-        }, 500); // Increased delay to ensure Google Maps API is loaded
+        }, 500); // Increased delay to ensure Leaflet is loaded
+    }
+
+    displayTripSummary() {
+        const places = this.generatedTrip.itinerary || this.generatedTrip.places || [];
+        
+        // Update places count
+        const placesElement = document.getElementById('summaryPlaces');
+        if (placesElement) {
+            placesElement.textContent = `${places.length} locations`;
+        }
+
+        // Update duration
+        const durationElement = document.getElementById('summaryDuration');
+        if (durationElement) {
+            const totalHours = places.length * 1.5; // Estimate 1.5 hours per place
+            durationElement.textContent = `${Math.round(totalHours)} hours`;
+        }
+
+        // Update distance (will be calculated by map)
+        const distanceElement = document.getElementById('summaryDistance');
+        if (distanceElement) {
+            distanceElement.textContent = this.generatedTrip.totalDistance || 'Calculating...';
+        }
+
+        // Update cost
+        const costElement = document.getElementById('summaryCost');
+        if (costElement) {
+            costElement.textContent = this.generatedTrip.estimatedCost || '₹500-2000';
+        }
     }
 
     displayItinerary() {
@@ -467,7 +494,8 @@ class MoodYatraApp {
 
         container.innerHTML = '';
 
-        this.generatedTrip.places.forEach((place, index) => {
+        const places = this.generatedTrip.itinerary || this.generatedTrip.places || [];
+        places.forEach((place, index) => {
             const itemElement = document.createElement('div');
             itemElement.className = 'itinerary-item slide-up';
             itemElement.style.animationDelay = `${index * 0.1}s`;
@@ -655,17 +683,16 @@ class MoodYatraApp {
 
     // Focus on a specific place on the map
     focusOnPlace(index) {
-        if (!this.generatedTrip || !this.generatedTrip.places[index]) return;
+        const places = this.generatedTrip?.itinerary || this.generatedTrip?.places || [];
+        if (!places[index]) return;
         
-        const place = this.generatedTrip.places[index];
-        if (window.mapsManager && window.mapsManager.map) {
-            const position = { lat: place.lat, lng: place.lng };
-            window.mapsManager.map.setCenter(position);
-            window.mapsManager.map.setZoom(16);
+        const place = places[index];
+        if (window.mapsManager && window.mapsManager.centerOnPlace) {
+            window.mapsManager.centerOnPlace(index);
             
-            // Trigger marker click to show info window
-            if (window.mapsManager.markers[index]) {
-                google.maps.event.trigger(window.mapsManager.markers[index], 'click');
+            // Open marker popup to show info window
+            if (window.mapsManager && window.mapsManager.openMarkerPopup) {
+                window.mapsManager.openMarkerPopup(index);
             }
         }
     }
@@ -690,7 +717,7 @@ function getCurrentLocation() {
                     window.reverseGeocode(lat, lng);
                 } else {
                     document.getElementById('location').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                    app.validateStep2();
+                    app.validateStep1();
                 }
             },
             (error) => {

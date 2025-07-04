@@ -93,7 +93,7 @@ async function verifyAPIKeys() {
     require('dotenv').config();
     
     const requiredKeys = {
-        'GOOGLE_MAPS_API_KEY': 'Google Maps API',
+        'GEMINI_API_KEY': 'Gemini AI API',
         'JWT_SECRET': 'JWT Secret'
     };
     
@@ -124,9 +124,9 @@ async function verifyAPIKeys() {
     
     if (!hasAllRequired) {
         console.log('\n📝 Please add the missing API keys to your .env file:');
-        console.log('   - Get Google Maps API key from: https://console.cloud.google.com/');
+        console.log('   - Get Gemini AI API key from: https://makersuite.google.com/app/apikey');
         console.log('   - Generate a secure JWT secret (random string)');
-        console.log('   - Optionally get Gemini API key from: https://makersuite.google.com/app/apikey');
+        console.log('   - Optionally get OpenTripMap API key from: https://opentripmap.io/product');
     }
 }
 

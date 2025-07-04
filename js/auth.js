@@ -177,6 +177,10 @@ class AuthManager {
                     <span class="user-name">Hi, ${this.currentUser.name}!</span>
                     <button class="btn-secondary" onclick="authManager.signOut()">Sign Out</button>
                 </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
             `;
         }
 
@@ -192,6 +196,10 @@ class AuthManager {
                     <span class="user-name">Hi, ${this.currentUser.name}!</span>
                     <button class="btn-secondary" onclick="authManager.signOut()">Sign Out</button>
                 </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
             `;
         }
     }
@@ -209,6 +217,10 @@ class AuthManager {
                 <a href="#" class="nav-link">Guide</a>
                 <a href="#" class="nav-link">Contact Us</a>
                 <button class="btn-secondary" onclick="showAuthModal()">Sign In</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
             `;
         }
 
@@ -221,6 +233,10 @@ class AuthManager {
                 <a href="#" class="mobile-nav-link">Guide</a>
                 <a href="#" class="mobile-nav-link">Contact Us</a>
                 <button class="btn-secondary mobile-signin" onclick="showAuthModal()">Sign In</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
             `;
         }
         

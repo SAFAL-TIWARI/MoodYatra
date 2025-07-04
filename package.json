@@ -17,7 +17,8 @@
     "ai",
     "trip-planning",
     "gemini",
-    "google-maps",
+    "openstreetmap",
+    "leaflet",
     "itinerary",
     "spontaneous-travel"
   ],
@@ -25,7 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
-    "@googlemaps/google-maps-services-js": "^3.3.42",
+    "axios": "^1.6.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.0.1",

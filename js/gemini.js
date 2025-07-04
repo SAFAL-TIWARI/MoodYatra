@@ -353,10 +353,12 @@ class GeminiAI {
 
     async getLocationCoordinates(location) {
         try {
-            // Use Google Geocoding API to get accurate coordinates
-            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
-            
-            const response = await fetch(geocodeUrl);
+            // Use backend geocoding service (Nominatim)
+            const response = await fetch('/api/geocode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: location })
+            });
             const data = await response.json();
             
             if (data.status === 'OK' && data.results.length > 0) {

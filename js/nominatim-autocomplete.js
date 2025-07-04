@@ -1,5 +1,5 @@
-// Location Autocomplete Manager
-class LocationAutocomplete {
+// Nominatim-based Location Autocomplete Manager
+class NominatimAutocomplete {
     constructor() {
         this.input = null;
         this.dropdown = null;
@@ -8,6 +8,8 @@ class LocationAutocomplete {
         this.debounceTimer = null;
         this.isVisible = false;
         this.sessionToken = null;
+        this.lastRequestTime = 0;
+        this.minRequestInterval = 1000; // 1 second between requests for Nominatim
         this.init();
     }
 
@@ -84,13 +86,25 @@ class LocationAutocomplete {
         // Debounce the API call
         this.debounceTimer = setTimeout(() => {
             this.fetchSuggestions(query);
-        }, 300);
+        }, 500); // Increased debounce for Nominatim
+    }
+
+    async rateLimit() {
+        const now = Date.now();
+        const timeSinceLastRequest = now - this.lastRequestTime;
+        if (timeSinceLastRequest < this.minRequestInterval) {
+            await new Promise(resolve => setTimeout(resolve, this.minRequestInterval - timeSinceLastRequest));
+        }
+        this.lastRequestTime = Date.now();
     }
 
     async fetchSuggestions(query) {
         try {
             // Show loading state
             this.showLoading();
+
+            // Rate limiting for Nominatim
+            await this.rateLimit();
 
             const response = await fetch('/api/places/autocomplete', {
                 method: 'POST',
@@ -115,7 +129,7 @@ class LocationAutocomplete {
             if (this.suggestions.length > 0) {
                 this.showDropdown();
             } else {
-                this.hideDropdown();
+                this.showNoResults();
             }
 
         } catch (error) {
@@ -128,13 +142,7 @@ class LocationAutocomplete {
         this.dropdown.innerHTML = '';
 
         if (this.suggestions.length === 0) {
-            const noResults = document.createElement('div');
-            noResults.className = 'dropdown-item no-results';
-            noResults.innerHTML = `
-                <i class="fas fa-search"></i>
-                <span>No locations found</span>
-            `;
-            this.dropdown.appendChild(noResults);
+            this.showNoResults();
             return;
         }
 
@@ -144,17 +152,24 @@ class LocationAutocomplete {
             item.dataset.index = index;
             
             // Parse the suggestion
-            const mainText = suggestion.structured_formatting?.main_text || suggestion.description;
-            const secondaryText = suggestion.structured_formatting?.secondary_text || '';
+            const mainText = suggestion.structured_formatting?.main_text || suggestion.description.split(',')[0];
+            const secondaryText = suggestion.structured_formatting?.secondary_text || 
+                                suggestion.description.split(',').slice(1).join(',').trim();
+            
+            // Determine place type icon
+            const icon = this.getPlaceIcon(suggestion.types);
             
             item.innerHTML = `
                 <div class="suggestion-content">
                     <div class="suggestion-icon">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="${icon}"></i>
                     </div>
                     <div class="suggestion-text">
                         <div class="suggestion-main">${this.highlightMatch(mainText, this.input.value)}</div>
                         ${secondaryText ? `<div class="suggestion-secondary">${secondaryText}</div>` : ''}
+                    </div>
+                    <div class="suggestion-type">
+                        <span class="type-badge">${this.getPlaceTypeLabel(suggestion.types)}</span>
                     </div>
                 </div>
             `;
@@ -171,6 +186,60 @@ class LocationAutocomplete {
 
             this.dropdown.appendChild(item);
         });
+    }
+
+    getPlaceIcon(types) {
+        if (!types || types.length === 0) return 'fas fa-map-marker-alt';
+        
+        const iconMap = {
+            'locality': 'fas fa-city',
+            'country': 'fas fa-flag',
+            'administrative_area_level_1': 'fas fa-map',
+            'administrative_area_level_2': 'fas fa-map-signs',
+            'establishment': 'fas fa-building',
+            'point_of_interest': 'fas fa-star',
+            'tourist_attraction': 'fas fa-camera',
+            'airport': 'fas fa-plane',
+            'train_station': 'fas fa-train',
+            'university': 'fas fa-graduation-cap',
+            'hospital': 'fas fa-hospital',
+            'school': 'fas fa-school'
+        };
+        
+        for (const type of types) {
+            if (iconMap[type]) {
+                return iconMap[type];
+            }
+        }
+        
+        return 'fas fa-map-marker-alt';
+    }
+
+    getPlaceTypeLabel(types) {
+        if (!types || types.length === 0) return 'Place';
+        
+        const labelMap = {
+            'locality': 'City',
+            'country': 'Country',
+            'administrative_area_level_1': 'State',
+            'administrative_area_level_2': 'County',
+            'establishment': 'Business',
+            'point_of_interest': 'POI',
+            'tourist_attraction': 'Attraction',
+            'airport': 'Airport',
+            'train_station': 'Station',
+            'university': 'University',
+            'hospital': 'Hospital',
+            'school': 'School'
+        };
+        
+        for (const type of types) {
+            if (labelMap[type]) {
+                return labelMap[type];
+            }
+        }
+        
+        return 'Place';
     }
 
     highlightMatch(text, query) {
@@ -194,7 +263,20 @@ class LocationAutocomplete {
         this.dropdown.innerHTML = `
             <div class="dropdown-item error">
                 <i class="fas fa-exclamation-triangle"></i>
-                <span>Error loading suggestions</span>
+                <span>Error loading suggestions. Please try again.</span>
+            </div>
+        `;
+        this.showDropdown();
+    }
+
+    showNoResults() {
+        this.dropdown.innerHTML = `
+            <div class="dropdown-item no-results">
+                <i class="fas fa-search"></i>
+                <div class="no-results-content">
+                    <span class="no-results-title">No locations found</span>
+                    <span class="no-results-subtitle">Try a different search term</span>
+                </div>
             </div>
         `;
         this.showDropdown();
@@ -217,7 +299,6 @@ class LocationAutocomplete {
 
     positionDropdown() {
         const inputRect = this.input.getBoundingClientRect();
-        const dropdownRect = this.dropdown.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         
         // Check if there's enough space below
@@ -281,7 +362,8 @@ class LocationAutocomplete {
         if (index < 0 || index >= this.suggestions.length) return;
 
         const suggestion = this.suggestions[index];
-        const mainText = suggestion.structured_formatting?.main_text || suggestion.description;
+        const mainText = suggestion.structured_formatting?.main_text || 
+                        suggestion.description.split(',')[0];
         
         // Set the input value
         this.input.value = mainText;
@@ -311,8 +393,8 @@ class LocationAutocomplete {
     }
 
     generateSessionToken() {
-        // Generate a random session token for billing purposes
-        this.sessionToken = 'session_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        // Generate a random session token
+        this.sessionToken = 'nominatim_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
     }
 
     // Public methods
@@ -335,17 +417,46 @@ class LocationAutocomplete {
             fullDescription: this.input.dataset.fullDescription
         };
     }
+
+    // Method to get coordinates for selected place
+    async getPlaceCoordinates(placeId) {
+        try {
+            const response = await fetch('/api/places/details', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    placeId: placeId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch place details');
+            }
+
+            const data = await response.json();
+            return {
+                lat: data.lat,
+                lng: data.lng,
+                address: data.address
+            };
+        } catch (error) {
+            console.error('Error fetching place coordinates:', error);
+            return null;
+        }
+    }
 }
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Only initialize if we're on the app page
     if (document.getElementById('location')) {
-        window.locationAutocomplete = new LocationAutocomplete();
+        window.locationAutocomplete = new NominatimAutocomplete();
     }
 });
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = LocationAutocomplete;
+    module.exports = NominatimAutocomplete;
 }

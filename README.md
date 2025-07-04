@@ -12,7 +12,7 @@ MoodYatra is a lightweight, AI-powered web application that generates personaliz
 
 - **🤖 AI-Powered Planning**: Uses Gemini AI to create unique, personalized itineraries
 - **🎭 Mood-Based Recommendations**: Choose from Fun, Chill, Nature, or Romantic vibes
-- **🗺️ Interactive Maps**: Google Maps integration with real-time places and routes
+- **🗺️ Interactive Maps**: Open-source Leaflet.js with OpenStreetMap tiles and routing
 - **📱 Mobile-First Design**: Responsive, clean interface that works on all devices
 - **📄 PDF Export**: Download your itinerary as a beautiful PDF
 - **🔗 Easy Sharing**: Share trips via link or QR code - no login required to view
@@ -24,8 +24,8 @@ MoodYatra is a lightweight, AI-powered web application that generates personaliz
 ### Prerequisites
 
 - Node.js 16+ and npm 8+
-- Google Maps API key
-- Gemini AI API key (optional - works with mock data)
+- Gemini AI API key (required for AI features)
+- OpenTripMap API key (optional - enhances place data)
 
 ### Installation
 
@@ -61,22 +61,28 @@ MoodYatra is a lightweight, AI-powered web application that generates personaliz
 
 ### Required API Keys
 
-1. **Google Maps API Key**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Enable Maps JavaScript API, Places API, and Geocoding API
-   - Create credentials and add to `.env`
+1. **Gemini AI API Key** (Required)
+   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Create a new API key for Gemini AI
+   - Add to your `.env` file
 
-2. **Gemini AI API Key** (Optional)
-   - Get your key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. **OpenTripMap API Key** (Optional)
+   - Get your key from [OpenTripMap](https://opentripmap.io/product)
+   - Enhances place information with ratings and details
    - Add to `.env` (app works with mock data if not provided)
 
 ### Environment Variables
 
 ```env
 # Required
-GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 
-# Optional (uses mock data if not provided)
+# Open Source Map Services (Optional - uses mock data if not provided)
+OPENTRIPMAP_API_KEY=your_opentripmap_api_key_here
+NOMINATIM_API_URL=https://nominatim.openstreetmap.org
+WIKIPEDIA_API_URL=https://en.wikipedia.org/api/rest_v1
+
+# Optional
 GEMINI_API_KEY=your_gemini_api_key_here
 
 # Security
@@ -103,8 +109,33 @@ PORT=3000
 
 ### APIs & Services
 - **Gemini AI**: Trip generation and recommendations
-- **Google Maps**: Places, geocoding, and mapping
-- **Google OAuth**: Optional social login
+- **Leaflet.js**: Interactive maps with OpenStreetMap tiles
+- **Nominatim**: Geocoding and place search (OpenStreetMap)
+- **OpenTripMap**: Enhanced place information and ratings
+- **Wikipedia API**: Place images and descriptions
+- **OSRM**: Route calculation and directions
+
+## 🌍 Open Source Mapping Benefits
+
+### Why We Chose Open Source Over Google Maps
+
+- **🆓 Cost-Effective**: No usage fees or billing setup required
+- **🔒 Privacy-First**: No user tracking or data collection
+- **🌍 Community-Driven**: Powered by OpenStreetMap's global community
+- **🛡️ No Vendor Lock-in**: Full control over mapping infrastructure
+- **📈 Scalable**: No request limits for basic features
+- **🔧 Customizable**: Full control over map appearance and functionality
+
+### Mapping Stack
+
+| Component | Service | Purpose | Cost |
+|-----------|---------|---------|------|
+| **Interactive Maps** | Leaflet.js + OSM Tiles | Map display and interaction | Free |
+| **Geocoding** | Nominatim | Address to coordinates | Free |
+| **Place Search** | Nominatim + OpenTripMap | Location autocomplete | Free/Optional |
+| **Place Images** | Wikipedia Media API | High-quality place photos | Free |
+| **Routing** | OSRM | Directions and route optimization | Free |
+| **Place Details** | OpenTripMap | Ratings, descriptions, POI data | Optional API |
 
 ## 📱 Usage
 
@@ -156,14 +187,14 @@ MoodYatra/
 │   ├── app.js            # Main application logic
 │   ├── auth.js           # Authentication system
 │   ├── gemini.js         # AI integration
-│   ├── maps.js           # Google Maps integration
+│   ├── leaflet-maps.js   # Leaflet maps integration
 │   └── pdf.js            # PDF export functionality
 ├── backend/
 │   ├── server.js         # Express server
 │   ├── database.js       # SQLite database manager
 │   └── services/
 │       ├── gemini.js     # Gemini AI service
-│       └── googlemaps.js # Google Maps service
+│       └── openmaps.js   # Open source maps service
 └── package.json
 ```
 
@@ -290,7 +321,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **Google Gemini AI** for intelligent trip generation
-- **Google Maps Platform** for location services
+- **OpenStreetMap & Leaflet.js** for location services
 - **OpenStreetMap** for additional mapping data
 - **Unsplash/Picsum** for placeholder images
 - **Font Awesome** for beautiful icons

@@ -44,26 +44,28 @@
                 </button>
             </div>
 
-            <!-- Mobile Menu Toggle -->
-            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+            <!-- Mobile Controls -->
+            <div class="mobile-controls">
+                <button class="theme-toggle mobile-theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </div>
 
         <!-- Mobile Navigation Menu -->
         <div class="mobile-nav" id="mobileNav">
             <div class="mobile-nav-content">
-                <a href="#" class="mobile-nav-link">My Trips</a>
-                <a href="#" class="mobile-nav-link">Explore</a>
-                <a href="#" class="mobile-nav-link">Travel Guide</a>
-                <a href="#" class="mobile-nav-link">Contact</a>
+                <a href="/my-trips.html" class="mobile-nav-link">My Trips</a>
+                <a href="/travel-guide.html" class="mobile-nav-link">Travel Guide</a>
+                <a href="/about.html" class="mobile-nav-link">About Us</a>
+                <a href="/contact.html" class="mobile-nav-link">Contact Us</a>
                 <button class="btn-secondary mobile-signin" onclick="showAuthModal()">Sign In</button>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </button>
             </div>
         </div>
     </header>
@@ -77,53 +79,28 @@
                 <div class="step-indicator">
                     <div class="step active" data-step="1">
                         <span>1</span>
-                        <label>Mood</label>
+                        <label>Details</label>
                     </div>
                     <div class="step" data-step="2">
                         <span>2</span>
-                        <label>Details</label>
-                    </div>
-                    <div class="step" data-step="3">
-                        <span>3</span>
                         <label>Generate</label>
                     </div>
                 </div>
 
                 <!-- Form Steps -->
                 <div class="form-container border-glow">
-                    <!-- Step 1: Mood Selection -->
+                    <!-- Step 1: Trip Details -->
                     <div class="form-step active" id="step1">
-                        <h2>What's your travel vibe today?</h2>
-                        <div class="mood-selection">
-                            <button class="mood-option" data-mood="fun">
-                                <div class="mood-icon">🎢</div>
-                                <span>Adventure & Fun</span>
-                            </button>
-                            <button class="mood-option" data-mood="chill">
-                                <div class="mood-icon">🏖️</div>
-                                <span>Relax & Unwind</span>
-                            </button>
-                            <button class="mood-option" data-mood="nature">
-                                <div class="mood-icon">🏔️</div>
-                                <span>Nature Escape</span>
-                            </button>
-                            <button class="mood-option" data-mood="romantic">
-                                <div class="mood-icon">🌅</div>
-                                <span>Romantic Getaway</span>
-                            </button>
-                        </div>
-                        <button class="btn-primary" onclick="nextStep()" disabled id="nextBtn1">Continue</button>
-                    </div>
-
-                    <!-- Step 2: Trip Details -->
-                    <div class="form-step" id="step2">
                         <h2>Tell us about your trip</h2>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="location">Starting Location</label>
                                 <div class="location-input">
-                                    <input type="text" id="location" placeholder="Enter your location" enterkeyhint="enter" >
-                                    <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                                    <input type="text" id="location" placeholder="Enter your location"
+                                        enterkeyhint="enter">
+                                        <ul id="locationSuggestions" class="suggestions-list" style="display: none;"></ul>
+
+                                    <button title="Use Current Location" type="button" class="location-btn" onclick="getCurrentLocation()">
                                         <i class="fas fa-location-arrow"></i>
                                     </button>
                                 </div>
@@ -132,9 +109,9 @@
                             <div class="form-group">
                                 <label for="duration">Time Available</label>
                                 <select id="duration">
-                                    <option value="2">2 hours</option>
+                                    <option value="2" selected>2 hours</option>
                                     <option value="4">4 hours</option>
-                                    <option value="6" selected>6 hours</option>
+                                    <option value="6" >6 hours</option>
                                     <option value="8">8 hours (Full day)</option>
                                     <option value="12">12+ hours</option>
                                 </select>
@@ -153,6 +130,28 @@
                                     </div>
                                 </div>
                                 <div class="budget-display" id="budgetDisplay">Moderate (₹₹)</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>What's your travel vibe today?</label>
+                                <div class="mood-selection">
+                                    <button class="mood-option" data-mood="fun">
+                                        <div class="mood-icon">🎢</div>
+                                        <span>Adventure & Fun</span>
+                                    </button>
+                                    <button class="mood-option" data-mood="chill">
+                                        <div class="mood-icon">🏖️</div>
+                                        <span>Relax & Unwind</span>
+                                    </button>
+                                    <button class="mood-option" data-mood="nature">
+                                        <div class="mood-icon">🏔️</div>
+                                        <span>Nature Escape</span>
+                                    </button>
+                                    <button class="mood-option" data-mood="romantic">
+                                        <div class="mood-icon">🌅</div>
+                                        <span>Romantic Getaway</span>
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="form-group prompt-section">
@@ -187,33 +186,16 @@ Examples:
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>Additional Preferences</label>
-                                <div class="preferences">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="foodie">
-                                        <span>Include food experiences</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="cultural">
-                                        <span>Cultural attractions</span>
-                                    </label>
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="shopping">
-                                        <span>Shopping opportunities</span>
-                                    </label>
-                                </div>
-                            </div>
+                            
                         </div>
 
                         <div class="form-actions">
-                            <button class="btn-secondary" onclick="prevStep()">Back</button>
-                            <button class="btn-primary" onclick="nextStep()" id="nextBtn2">Generate Trip</button>
+                            <button class="btn-primary" onclick="nextStep()" id="nextBtn1">Generate Trip</button>
                         </div>
                     </div>
 
-                    <!-- Step 3: Loading & Results -->
-                    <div class="form-step" id="step3">
+                    <!-- Step 2: Loading & Results -->
+                    <div class="form-step" id="step2">
                         <div class="loading-container" id="loadingState">
                             <div class="loading-animation">
                                 <div class="spinner"></div>
@@ -232,82 +214,85 @@ Examples:
                                 </div>
                             </div>
 
-                            <div class="results-content">
-                                <div class="itinerary-section">
-                                    <div class="section-header">
-                                        <h3><i class="fas fa-list-ul"></i> Your Itinerary</h3>
-                                        <div class="trip-summary">
-                                            <span id="totalDistance" class="summary-item">
-                                                <i class="fas fa-route"></i>
-                                                <span>Calculating...</span>
-                                            </span>
-                                            <span id="totalCost" class="summary-item">
-                                                <i class="fas fa-rupee-sign"></i>
-                                                <span id="estimatedCost">₹0</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div id="itineraryList" class="itinerary-list">
-                                        <!-- Itinerary items will be populated here -->
+                            <!-- Trip Summary Section -->
+                            <div class="trip-summary-section">
+                            </div>
+                        </div>
+                        <div class="results-content">
+                            <div class="itinerary-section">
+                                <div class="section-header">
+                                    <h3><i class="fas fa-list-ul"></i> Your Itinerary</h3>
+                                    <div class="trip-summary">
+                                        <span id="totalDistance" class="summary-item">
+                                            <i class="fas fa-route"></i>
+                                            <span>Calculating...</span>
+                                        </span>
+                                        <span id="totalCost" class="summary-item">
+                                            <i class="fas fa-rupee-sign"></i>
+                                            <span id="estimatedCost">₹0</span>
+                                        </span>
                                     </div>
                                 </div>
-
-                                <div class="map-section">
-                                    <div class="section-header">
-                                        <h3><i class="fas fa-map-marked-alt"></i> Your Route</h3>
-                                        <div class="map-controls">
-                                            <button class="map-control-btn" onclick="toggleMapView()"
-                                                id="mapViewToggle">
-                                                <i class="fas fa-satellite"></i>
-                                                Satellite
-                                            </button>
-                                            <button class="map-control-btn" onclick="centerMap()">
-                                                <i class="fas fa-crosshairs"></i>
-                                                Center
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div id="map" class="map-container"></div>
-                                    <div class="map-legend">
-                                        <div class="legend-item">
-                                            <div class="legend-marker cultural"></div>
-                                            <span>Cultural</span>
-                                        </div>
-                                        <div class="legend-item">
-                                            <div class="legend-marker restaurant"></div>
-                                            <span>Restaurant</span>
-                                        </div>
-                                        <div class="legend-item">
-                                            <div class="legend-marker park"></div>
-                                            <span>Park/Nature</span>
-                                        </div>
-                                        <div class="legend-item">
-                                            <div class="legend-marker entertainment"></div>
-                                            <span>Entertainment</span>
-                                        </div>
-                                    </div>
+                                <div id="itineraryList" class="itinerary-list">
+                                    <!-- Itinerary items will be populated here -->
                                 </div>
                             </div>
 
-                            <div class="results-actions">
-                                <button class="btn-secondary" onclick="generateNew()">
-                                    <i class="fas fa-redo"></i>
-                                    Generate New
-                                </button>
-                                <button class="btn-primary" onclick="exportPDF()">
-                                    <i class="fas fa-download"></i>
-                                    Export PDF
-                                </button>
-                                <button class="btn-primary" onclick="shareTrip()">
-                                    <i class="fas fa-share-alt"></i>
-                                    Share Trip
-                                </button>
+                            <div class="map-section">
+                                <div class="section-header">
+                                    <h3><i class="fas fa-map-marked-alt"></i> Your Route</h3>
+                                    <div class="map-controls">
+                                        <button class="map-control-btn" onclick="toggleMapView()" id="mapViewToggle">
+                                            <i class="fas fa-satellite"></i>
+                                            Satellite
+                                        </button>
+                                        <button class="map-control-btn" onclick="centerMap()">
+                                            <i class="fas fa-crosshairs"></i>
+                                            Center
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="map" class="map-container"></div>
+                                <div class="map-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-marker cultural"></div>
+                                        <span>Cultural</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-marker restaurant"></div>
+                                        <span>Restaurant</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-marker park"></div>
+                                        <span>Park/Nature</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-marker entertainment"></div>
+                                        <span>Entertainment</span>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+
+                        <div class="results-actions">
+                            <button class="btn-secondary" onclick="generateNew()">
+                                <i class="fas fa-redo"></i>
+                                Generate New
+                            </button>
+                            <button class="btn-primary" onclick="exportPDF()">
+                                <i class="fas fa-download"></i>
+                                Export PDF
+                            </button>
+                            <button class="btn-primary" onclick="shareTrip()">
+                                <i class="fas fa-share-alt"></i>
+                                Share Trip
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+    </div>
+    </section>
     </div>
 
     <!-- Share Modal -->
@@ -383,15 +368,19 @@ Examples:
     </div>
 
     <!-- Scripts -->
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=process.env.GOOGLE_MAPS_API_KEY&libraries=places&callback=initMaps"
-        async defer></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/maps.js"></script>
+    <script src="js/leaflet-maps.js"></script>
     <script src="js/gemini.js"></script>
     <script src="js/pdf.js"></script>
-    <script src="js/autocomplete.js"></script>
+    <script src="js/simple-location-autocomplete.js"></script>
     <script src="js/app.js"></script>
 
     <script>

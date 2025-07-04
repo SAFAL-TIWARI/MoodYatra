@@ -11,7 +11,7 @@ const { body, validationResult } = require('express-validator');
 // Import database and AI modules
 const Database = require('./database');
 const GeminiService = require('./services/gemini');
-const GoogleMapsService = require('./services/googlemaps');
+const OpenMapsService = require('./services/openmaps');
 
 class MoodYatraServer {
     constructor() {
@@ -19,7 +19,7 @@ class MoodYatraServer {
         this.port = process.env.PORT || 3000;
         this.db = new Database();
         this.geminiService = new GeminiService();
-        this.mapsService = new GoogleMapsService();
+        this.mapsService = new OpenMapsService();
         
         this.init();
     }
@@ -297,7 +297,7 @@ class MoodYatraServer {
                 // Generate trip using Gemini AI
                 const generatedTrip = await this.geminiService.generateTrip(tripData);
 
-                // Enhance with Google Maps data
+                // Enhance with open source maps data
                 const enhancedTrip = await this.mapsService.enhanceTripData(generatedTrip, tripData.location);
 
                 res.json(enhancedTrip);
@@ -354,6 +354,77 @@ class MoodYatraServer {
                 console.error('Place autocomplete error:', error);
                 res.status(500).json({ 
                     message: 'Failed to get place suggestions',
+                    error: process.env.NODE_ENV === 'development' ? error.message : undefined
+                });
+            }
+        });
+
+        // Nearby places search
+        this.app.post('/api/places/nearby', [
+            body('lat').isFloat({ min: -90, max: 90 }).withMessage('Valid latitude required'),
+            body('lng').isFloat({ min: -180, max: 180 }).withMessage('Valid longitude required'),
+            body('type').optional().isString().withMessage('Type must be a string'),
+            body('radius').optional().isInt({ min: 100, max: 50000 }).withMessage('Radius must be between 100 and 50000 meters')
+        ], async (req, res) => {
+            try {
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.status(400).json({ errors: errors.array() });
+                }
+
+                const { lat, lng, type, radius } = req.body;
+                const nearbyPlaces = await this.mapsService.searchNearbyPlaces(
+                    { lat, lng }, 
+                    type || 'point_of_interest', 
+                    radius || 1000
+                );
+                
+                res.json(nearbyPlaces);
+            } catch (error) {
+                console.error('Nearby places search error:', error);
+                res.status(500).json({ 
+                    message: 'Failed to search nearby places',
+                    error: process.env.NODE_ENV === 'development' ? error.message : undefined
+                });
+            }
+        });
+
+        // Place details
+        this.app.post('/api/places/details', [
+            body('placeId').isString().withMessage('Place ID required')
+        ], async (req, res) => {
+            try {
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.status(400).json({ errors: errors.array() });
+                }
+
+                const { placeId } = req.body;
+                
+                // For OSM place IDs, extract coordinates from the ID format
+                if (placeId.startsWith('osm_')) {
+                    const parts = placeId.split('_');
+                    if (parts.length >= 3) {
+                        // For now, return mock coordinates - in a real implementation,
+                        // you'd query Nominatim with the OSM ID
+                        res.json({
+                            lat: 40.7128 + (Math.random() - 0.5) * 0.1,
+                            lng: -74.0060 + (Math.random() - 0.5) * 0.1,
+                            address: 'Address not available'
+                        });
+                        return;
+                    }
+                }
+                
+                res.json({
+                    lat: 40.7128,
+                    lng: -74.0060,
+                    address: 'Address not available'
+                });
+            } catch (error) {
+                console.error('Place details error:', error);
+                res.status(500).json({ 
+                    message: 'Failed to get place details',
                     error: process.env.NODE_ENV === 'development' ? error.message : undefined
                 });
             }
