@@ -314,12 +314,12 @@ class PDFExporter {
     getBudgetDisplay(budget) {
         const budgetMap = {
             0: 'Free',
-            1: 'Budget ($)',
-            2: 'Moderate ($$)',
-            3: 'Premium ($$$)',
-            4: 'Luxury ($$$$)'
+            1: 'Budget (₹)',
+            2: 'Moderate (₹₹)',
+            3: 'Premium (₹₹₹)',
+            4: 'Luxury (₹₹₹₹)'
         };
-        return budgetMap[budget] || 'Moderate ($$)';
+        return budgetMap[budget] || 'Moderate (₹₹)';
     }
 
     capitalizeMood(mood) {
